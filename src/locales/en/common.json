@@ -1,0 +1,40 @@
+{
+  "app": {
+    "name": "AutoShop Manager"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "customers": "Customers",
+    "vehicles": "Vehicles",
+    "services": "Services",
+    "invoices": "Invoices",
+    "reminders": "Reminders",
+    "expenses": "Expenses",
+    "parts": "Parts Catalog",
+    "reports": "Reports"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search...",
+    "loading": "Loading...",
+    "noResults": "No results found",
+    "confirm": "Confirm",
+    "back": "Back",
+    "actions": "Actions"
+  },
+  "theme": {
+    "dark": "Dark Mode",
+    "light": "Light Mode"
+  },
+  "auth": {
+    "login": "Log In",
+    "logout": "Log Out",
+    "email": "Email",
+    "password": "Password",
+    "error": "Login failed. Please try again."
+  }
+}
