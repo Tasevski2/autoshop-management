@@ -1,0 +1,132 @@
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import { X } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { useBrands } from '@/features/settings/hooks/useBrandsModels'
+
+interface BrandPickerProps {
+  value: string
+  displayName?: string
+  onChange: (brandName: string) => void
+}
+
+export default function BrandPicker({ value, displayName, onChange }: BrandPickerProps) {
+  const { t } = useTranslation()
+  const [search, setSearch] = useState('')
+  const [open, setOpen] = useState(false)
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({})
+  const inputRef = useRef<HTMLInputElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  const { data: brands = [] } = useBrands()
+
+  const filtered = useMemo(() => {
+    if (!search) return brands
+    const lower = search.toLowerCase()
+    return brands.filter((b) => b.name.toLowerCase().includes(lower))
+  }, [brands, search])
+
+  const updatePosition = useCallback(() => {
+    if (!inputRef.current) return
+    const rect = inputRef.current.getBoundingClientRect()
+    setDropdownStyle({
+      position: 'fixed',
+      top: rect.bottom + 4,
+      left: rect.left,
+      width: rect.width,
+      zIndex: 50,
+    })
+  }, [])
+
+  useEffect(() => {
+    if (!open) return
+    updatePosition()
+    window.addEventListener('scroll', updatePosition, true)
+    window.addEventListener('resize', updatePosition)
+    return () => {
+      window.removeEventListener('scroll', updatePosition, true)
+      window.removeEventListener('resize', updatePosition)
+    }
+  }, [open, updatePosition])
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      const target = e.target as Node
+      if (
+        inputRef.current && !inputRef.current.contains(target) &&
+        dropdownRef.current && !dropdownRef.current.contains(target)
+      ) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  if (value && displayName) {
+    return (
+      <div className="flex items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm">
+        <span className="flex-1">{displayName}</span>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon-xs"
+          onClick={() => {
+            onChange('')
+            setSearch('')
+          }}
+        >
+          <X className="h-3.5 w-3.5" />
+        </Button>
+      </div>
+    )
+  }
+
+  if (brands.length === 0) {
+    return (
+      <p className="text-sm text-muted-foreground border border-dashed rounded-md px-3 py-2">
+        {t('vehicles.noBrandsHint')}
+      </p>
+    )
+  }
+
+  const dropdown = open && filtered.length > 0
+    ? createPortal(
+        <div ref={dropdownRef} style={dropdownStyle} className="max-h-48 overflow-auto rounded-md border bg-popover shadow-md">
+          {filtered.map((brand) => (
+            <button
+              key={brand.id}
+              type="button"
+              className="flex w-full items-center px-3 py-2 text-sm hover:bg-accent transition-colors text-left"
+              onClick={() => {
+                onChange(brand.name)
+                setSearch('')
+                setOpen(false)
+              }}
+            >
+              <span className="font-medium">{brand.name}</span>
+            </button>
+          ))}
+        </div>,
+        document.body
+      )
+    : null
+
+  return (
+    <div>
+      <Input
+        ref={inputRef}
+        value={search}
+        onChange={(e) => {
+          setSearch(e.target.value)
+          setOpen(true)
+        }}
+        onFocus={() => setOpen(true)}
+        placeholder={t('vehicles.searchBrand')}
+      />
+      {dropdown}
+    </div>
+  )
+}

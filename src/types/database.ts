@@ -1,3 +1,4 @@
+Connecting to db 5432
 export type Json =
   | string
   | number
@@ -209,7 +210,6 @@ export type Database = {
       parts_catalog: {
         Row: {
           buy_price: number
-          category: string | null
           created_at: string
           description: string | null
           id: string
@@ -221,7 +221,6 @@ export type Database = {
         }
         Insert: {
           buy_price?: number
-          category?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -233,7 +232,6 @@ export type Database = {
         }
         Update: {
           buy_price?: number
-          category?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -344,6 +342,7 @@ export type Database = {
           created_at: string
           description: string | null
           file_name: string | null
+          file_size: number | null
           id: string
           service_id: string
           storage_path: string
@@ -352,6 +351,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           file_name?: string | null
+          file_size?: number | null
           id?: string
           service_id: string
           storage_path: string
@@ -360,6 +360,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           file_name?: string | null
+          file_size?: number | null
           id?: string
           service_id?: string
           storage_path?: string
@@ -513,16 +514,86 @@ export type Database = {
         }
         Relationships: []
       }
+      vehicle_brands: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_brands_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vehicle_models: {
+        Row: {
+          brand_id: string
+          created_at: string
+          id: string
+          name: string
+          user_id: string | null
+        }
+        Insert: {
+          brand_id: string
+          created_at?: string
+          id?: string
+          name: string
+          user_id?: string | null
+        }
+        Update: {
+          brand_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_models_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_models_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicles: {
         Row: {
           brand: string
           chassis_number: string | null
-          color: string | null
           created_at: string
           customer_id: string
+          engine_capacity: number | null
+          engine_designation: string | null
           engine_type: string | null
           id: string
           last_known_mileage: number | null
+          last_service_id: string | null
           model: string | null
           notes: string | null
           plate_number: string
@@ -532,12 +603,14 @@ export type Database = {
         Insert: {
           brand: string
           chassis_number?: string | null
-          color?: string | null
           created_at?: string
           customer_id: string
+          engine_capacity?: number | null
+          engine_designation?: string | null
           engine_type?: string | null
           id?: string
           last_known_mileage?: number | null
+          last_service_id?: string | null
           model?: string | null
           notes?: string | null
           plate_number: string
@@ -547,12 +620,14 @@ export type Database = {
         Update: {
           brand?: string
           chassis_number?: string | null
-          color?: string | null
           created_at?: string
           customer_id?: string
+          engine_capacity?: number | null
+          engine_designation?: string | null
           engine_type?: string | null
           id?: string
           last_known_mileage?: number | null
+          last_service_id?: string | null
           model?: string | null
           notes?: string | null
           plate_number?: string
@@ -565,6 +640,20 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicles_last_service_id_fkey"
+            columns: ["last_service_id"]
+            isOneToOne: false
+            referencedRelation: "service_totals"
+            referencedColumns: ["service_id"]
+          },
+          {
+            foreignKeyName: "vehicles_last_service_id_fkey"
+            columns: ["last_service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
             referencedColumns: ["id"]
           },
         ]
@@ -595,7 +684,148 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      generate_reminder_notifications: { Args: never; Returns: undefined }
+      get_brand_distribution: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          brand: string
+          count: number
+        }[]
+      }
+      get_customer_rankings: {
+        Args: {
+          p_date_from: string
+          p_date_to: string
+          p_page?: number
+          p_page_size?: number
+          p_sort_column?: string
+          p_sort_direction?: string
+        }
+        Returns: {
+          collected: number
+          customer_id: string
+          full_name: string
+          owes: number
+          phone: string
+          profit: number
+          services_count: number
+          total_count: number
+          total_revenue: number
+        }[]
+      }
+      get_customer_summary: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          active_count: number
+          avg_invoice: number
+          new_count: number
+        }[]
+      }
+      get_daily_breakdown: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          bucket_date: string
+          collected: number
+          net: number
+          operating_expenses: number
+          parts_cost: number
+          revenue: number
+          service_count: number
+        }[]
+      }
+      get_expense_totals: {
+        Args: { p_category?: string; p_date_from?: string; p_date_to?: string }
+        Returns: {
+          category: string
+          total: number
+        }[]
+      }
+      get_expenses_by_category: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          amount: number
+          category: string
+        }[]
+      }
+      get_financial_summary: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          margin: number
+          net_profit: number
+          operating_expenses: number
+          parts_cost: number
+          total_collected: number
+          total_revenue: number
+          uncollected: number
+        }[]
+      }
+      get_part_rankings: {
+        Args: {
+          p_date_from: string
+          p_date_to: string
+          p_page?: number
+          p_page_size?: number
+          p_sort_column?: string
+          p_sort_direction?: string
+        }
+        Returns: {
+          buy_cost_total: number
+          part_name: string
+          profit: number
+          qty_sold: number
+          sell_total: number
+          total_count: number
+        }[]
+      }
+      get_payments_by_method: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          amount: number
+          method: string
+        }[]
+      }
+      get_revenue_by_bucket: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          bucket_date: string
+          labor: number
+          parts_revenue: number
+        }[]
+      }
+      get_revenue_trend: {
+        Args: never
+        Returns: {
+          distinct_days: number
+          month: string
+          total_revenue: number
+        }[]
+      }
+      get_services_summary: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          avg_labor: number
+          avg_parts_per_service: number
+          total_services: number
+        }[]
+      }
+      get_today_expenses: { Args: { p_date: string }; Returns: number }
+      get_today_revenue: { Args: { p_date: string }; Returns: number }
+      get_total_unpaid: { Args: never; Returns: number }
+      get_weekday_utilization: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          day_index: number
+          service_count: number
+          weekday_occurrences: number
+        }[]
+      }
+      get_year_distribution: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          count: number
+          year_range: string
+        }[]
+      }
     }
     Enums: {
       expense_category:
@@ -614,6 +844,7 @@ export type Database = {
         | "in_progress"
         | "completed"
         | "invoiced"
+        | "partially_paid"
         | "paid"
         | "cancelled"
     }
@@ -763,6 +994,7 @@ export const Constants = {
         "in_progress",
         "completed",
         "invoiced",
+        "partially_paid",
         "paid",
         "cancelled",
       ],

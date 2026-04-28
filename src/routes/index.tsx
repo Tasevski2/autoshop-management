@@ -5,6 +5,26 @@ import RootLayout from '@/components/RootLayout'
 
 const DashboardPage = lazy(() => import('@/features/dashboard/components/DashboardPage'))
 const LoginPage = lazy(() => import('@/features/auth/components/LoginPage'))
+const CustomersListPage = lazy(() => import('@/features/customers/components/CustomersListPage'))
+const CustomerDetailPage = lazy(() => import('@/features/customers/components/CustomerDetailPage'))
+const CustomerFormPage = lazy(() => import('@/features/customers/components/CustomerFormPage'))
+const VehiclesListPage = lazy(() => import('@/features/vehicles/components/VehiclesListPage'))
+const VehicleDetailPage = lazy(() => import('@/features/vehicles/components/VehicleDetailPage'))
+const VehicleFormPage = lazy(() => import('@/features/vehicles/components/VehicleFormPage'))
+const ServicesListPage = lazy(() => import('@/features/services/components/ServicesListPage'))
+const ServiceDetailPage = lazy(() => import('@/features/services/components/ServiceDetailPage'))
+const ServiceFormPage = lazy(() => import('@/features/services/components/ServiceFormPage'))
+const RemindersPage = lazy(() => import('@/features/reminders/components/RemindersPage'))
+const ReminderFormPage = lazy(() => import('@/features/reminders/components/ReminderFormPage'))
+const ExpensesListPage = lazy(() => import('@/features/expenses/components/ExpensesListPage'))
+const ExpenseFormPage = lazy(() => import('@/features/expenses/components/ExpenseFormPage'))
+const SettingsPage = lazy(() => import('@/features/settings/components/SettingsPage'))
+const PartsCatalogPage = lazy(() => import('@/features/parts-catalog/components/PartsCatalogPage'))
+const InvoiceSettingsPage = lazy(() => import('@/features/settings/components/InvoiceSettingsPage'))
+const BrandsModelsPage = lazy(() => import('@/features/settings/components/BrandsModelsPage'))
+const PaymentsListPage = lazy(() => import('@/features/payments/components/PaymentsListPage'))
+const PaymentFormPage = lazy(() => import('@/features/payments/components/PaymentFormPage'))
+const ReportsPage = lazy(() => import('@/features/reports/components/ReportsPage'))
 
 function SuspenseWrapper({ children }: { children: React.ReactNode }) {
   return <Suspense fallback={null}>{children}</Suspense>
@@ -64,43 +84,109 @@ export const router = createBrowserRouter([
       },
       {
         path: 'customers',
-        element: <SuspenseWrapper><div className="text-2xl font-bold">Customers</div></SuspenseWrapper>,
+        element: <SuspenseWrapper><CustomersListPage /></SuspenseWrapper>,
+      },
+      {
+        path: 'customers/new',
+        element: <SuspenseWrapper><CustomerFormPage /></SuspenseWrapper>,
       },
       {
         path: 'customers/:id',
-        element: <SuspenseWrapper><div>Customer Detail</div></SuspenseWrapper>,
+        element: <SuspenseWrapper><CustomerDetailPage /></SuspenseWrapper>,
+      },
+      {
+        path: 'customers/:id/edit',
+        element: <SuspenseWrapper><CustomerFormPage /></SuspenseWrapper>,
       },
       {
         path: 'vehicles',
-        element: <SuspenseWrapper><div className="text-2xl font-bold">Vehicles</div></SuspenseWrapper>,
+        element: <SuspenseWrapper><VehiclesListPage /></SuspenseWrapper>,
+      },
+      {
+        path: 'vehicles/new',
+        element: <SuspenseWrapper><VehicleFormPage /></SuspenseWrapper>,
       },
       {
         path: 'vehicles/:id',
-        element: <SuspenseWrapper><div>Vehicle Detail</div></SuspenseWrapper>,
+        element: <SuspenseWrapper><VehicleDetailPage /></SuspenseWrapper>,
+      },
+      {
+        path: 'vehicles/:id/edit',
+        element: <SuspenseWrapper><VehicleFormPage /></SuspenseWrapper>,
       },
       {
         path: 'services',
-        element: <SuspenseWrapper><div className="text-2xl font-bold">Services</div></SuspenseWrapper>,
+        element: <SuspenseWrapper><ServicesListPage /></SuspenseWrapper>,
+      },
+      {
+        path: 'services/new',
+        element: <SuspenseWrapper><ServiceFormPage /></SuspenseWrapper>,
+      },
+      {
+        path: 'services/:id',
+        element: <SuspenseWrapper><ServiceDetailPage /></SuspenseWrapper>,
+      },
+      {
+        path: 'services/:id/edit',
+        element: <SuspenseWrapper><ServiceFormPage /></SuspenseWrapper>,
       },
       {
         path: 'invoices',
         element: <SuspenseWrapper><div className="text-2xl font-bold">Invoices</div></SuspenseWrapper>,
       },
       {
+        path: 'payments',
+        element: <SuspenseWrapper><PaymentsListPage /></SuspenseWrapper>,
+      },
+      {
+        path: 'payments/new',
+        element: <SuspenseWrapper><PaymentFormPage /></SuspenseWrapper>,
+      },
+      {
         path: 'reminders',
-        element: <SuspenseWrapper><div className="text-2xl font-bold">Reminders</div></SuspenseWrapper>,
+        element: <SuspenseWrapper><RemindersPage /></SuspenseWrapper>,
+      },
+      {
+        path: 'reminders/new',
+        element: <SuspenseWrapper><ReminderFormPage /></SuspenseWrapper>,
+      },
+      {
+        path: 'reminders/:id/edit',
+        element: <SuspenseWrapper><ReminderFormPage /></SuspenseWrapper>,
       },
       {
         path: 'expenses',
-        element: <SuspenseWrapper><div className="text-2xl font-bold">Expenses</div></SuspenseWrapper>,
+        element: <SuspenseWrapper><ExpensesListPage /></SuspenseWrapper>,
       },
       {
-        path: 'parts',
-        element: <SuspenseWrapper><div className="text-2xl font-bold">Parts Catalog</div></SuspenseWrapper>,
+        path: 'expenses/new',
+        element: <SuspenseWrapper><ExpenseFormPage /></SuspenseWrapper>,
+      },
+      {
+        path: 'expenses/:id/edit',
+        element: <SuspenseWrapper><ExpenseFormPage /></SuspenseWrapper>,
+      },
+      {
+        path: 'settings',
+        element: <SuspenseWrapper><SettingsPage /></SuspenseWrapper>,
+        children: [
+          {
+            path: 'parts',
+            element: <SuspenseWrapper><PartsCatalogPage /></SuspenseWrapper>,
+          },
+          {
+            path: 'brands',
+            element: <SuspenseWrapper><BrandsModelsPage /></SuspenseWrapper>,
+          },
+          {
+            path: 'invoices',
+            element: <SuspenseWrapper><InvoiceSettingsPage /></SuspenseWrapper>,
+          },
+        ],
       },
       {
         path: 'reports',
-        element: <SuspenseWrapper><div className="text-2xl font-bold">Reports</div></SuspenseWrapper>,
+        element: <SuspenseWrapper><ReportsPage /></SuspenseWrapper>,
       },
     ],
   },

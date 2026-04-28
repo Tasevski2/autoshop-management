@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Car workshop management app for a single user (a friend's auto repair shop). Handles customers, cars, service history, invoices, profit/expense tracking, reminders, and photo attachments.
+Car workshop management app. Handles customers, cars, service history, invoices, profit/expense tracking, reminders, and photo attachments.
 
 ## Tech Stack
 
@@ -119,7 +119,7 @@ supabase functions serve   # All functions with hot reload
 - `snake_case` for all SQL identifiers.
 - Foreign keys always have explicit `ON DELETE` behavior.
 - Every table has Row Level Security enabled. No exceptions.
-- Since this is a single-user app, RLS policies authenticate via `auth.uid()` matching the single owner user.
+- RLS policies authenticate via `auth.uid()`.
 
 ### RLS Policy Naming
 

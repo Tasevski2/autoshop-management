@@ -8,9 +8,10 @@ import {
   Wrench,
   FileText,
   Bell,
+  CreditCard,
   DollarSign,
-  Package,
   BarChart3,
+  Settings,
   Globe,
   LogOut,
   Moon,
@@ -28,6 +29,8 @@ import {
 } from '@/components/ui/sheet'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
+import TopBar from '@/components/TopBar'
+import QuickActionsFab from '@/components/QuickActionsFab'
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, labelKey: 'nav.dashboard' },
@@ -35,10 +38,11 @@ const navItems = [
   { to: '/vehicles', icon: Car, labelKey: 'nav.vehicles' },
   { to: '/services', icon: Wrench, labelKey: 'nav.services' },
   { to: '/invoices', icon: FileText, labelKey: 'nav.invoices' },
+  { to: '/payments', icon: CreditCard, labelKey: 'nav.payments' },
   { to: '/reminders', icon: Bell, labelKey: 'nav.reminders' },
   { to: '/expenses', icon: DollarSign, labelKey: 'nav.expenses' },
-  { to: '/parts', icon: Package, labelKey: 'nav.parts' },
   { to: '/reports', icon: BarChart3, labelKey: 'nav.reports' },
+  { to: '/settings', icon: Settings, labelKey: 'nav.settings' },
 ] as const
 
 interface SidebarContentProps {
@@ -164,15 +168,22 @@ export default function RootLayout() {
           </Sheet>
           <h1 className="text-sm font-semibold">{t('app.name')}</h1>
         </header>
-        <main className="flex-1 overflow-auto bg-background p-4">
-          <Outlet />
-        </main>
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <TopBar />
+          <main className="flex-1 overflow-auto bg-background p-4">
+            <Outlet />
+          </main>
+        </div>
       </div>
 
       {/* Desktop main */}
-      <main className="hidden md:block flex-1 overflow-auto bg-background p-6">
-        <Outlet />
-      </main>
+      <div className="hidden md:flex flex-1 flex-col overflow-hidden">
+        <TopBar />
+        <main className="flex-1 overflow-auto bg-background p-6">
+          <Outlet />
+        </main>
+      </div>
+      <QuickActionsFab />
     </div>
   )
 }
