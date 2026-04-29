@@ -28,7 +28,10 @@
     "actions": "Акции",
     "previous": "Претходна",
     "next": "Следна",
-    "page": "Страна {{current}} од {{total}}"
+    "page": "Страна {{current}} од {{total}}",
+    "required": "Ова поле е задолжително",
+    "saved": "Успешно зачувано",
+    "error": "Настана грешка"
   },
   "theme": {
     "dark": "Темен режим",
@@ -62,6 +65,12 @@
     "noNotes": "Нема белешки",
     "nameRequired": "Името е задолжително",
     "emailInvalid": "Невалидна е-пошта",
+    "customerType": "Тип на клиент",
+    "person": "Физичко лице",
+    "company": "Правно лице",
+    "address": "Адреса",
+    "city": "Град",
+    "taxNumber": "Даночен број",
     "vehiclesCount": "Возила",
     "totalRevenue": "Вкупен приход",
     "totalVisits": "Вкупно посети",
@@ -186,6 +195,7 @@
     "paymentDate": "Датум",
     "paymentNotes": "Белешки",
     "generateInvoice": "Генерирај фактура",
+    "labor": "Труд",
     "methods": {
       "cash": "Готовина",
       "card": "Картичка",
@@ -255,7 +265,20 @@
     "partsCatalog": "Каталог делови",
     "invoiceSettings": "Поставки за фактури",
     "brandsModels": "Марки и модели",
-    "invoicePlaceholder": "Поставки за фактури наскоро."
+    "invoice": {
+      "workshopInfo": "Информации за сервисот",
+      "workshopName": "Име на сервис",
+      "ownerName": "Име на сопственик",
+      "address": "Адреса",
+      "phone": "Телефон",
+      "email": "Е-пошта",
+      "financialInfo": "Финансиски информации",
+      "bankAccount": "Жиро сметка",
+      "bankName": "Банка",
+      "taxId": "ЕДБ",
+      "signing": "Потпис на фактура",
+      "authorizedSigner": "Лице овластено за потпис"
+    }
   },
   "parts": {
     "name": "Име на дел",
@@ -334,6 +357,37 @@
     "received": "Примено",
     "spent": "Потрошено",
     "net": "Нето"
+  },
+  "invoices": {
+    "title": "Фактури",
+    "editor": "Уредник на фактура",
+    "preview": "Преглед",
+    "lineItems": "Ставки",
+    "addRow": "Додади ред",
+    "removeRow": "Отстрани",
+    "description": "Опис",
+    "unit": "Е.М.",
+    "quantity": "Количина",
+    "priceWithoutTax": "Цена без данок",
+    "discountPercent": "Рабат %",
+    "discount": "Рабат",
+    "vatPercent": "ДДВ %",
+    "amountWithVat": "Износ со ДДВ",
+    "invoiceDate": "Датум",
+    "dueDate": "Валута",
+    "invoiceNumber": "Фактура бр.",
+    "generatePdf": "Генерирај PDF",
+    "noInvoices": "Нема фактури",
+    "date": "Датум",
+    "customer": "Клиент",
+    "vehicle": "Возило",
+    "total": "Вкупно",
+    "download": "Преземи",
+    "regenerate": "Регенерирај",
+    "laborForVehicle": "Работна рака за возило {{plate}}",
+    "pc": "ком",
+    "dateFrom": "Од",
+    "dateTo": "До"
   },
   "auth": {
     "login": "Најава",

@@ -37,32 +37,44 @@ export type Database = {
     Tables: {
       customers: {
         Row: {
+          address: string | null
+          city: string | null
           created_at: string
+          customer_type: string
           email: string | null
           full_name: string
           id: string
           notes: string | null
           phone: string | null
+          tax_number: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          address?: string | null
+          city?: string | null
           created_at?: string
+          customer_type?: string
           email?: string | null
           full_name: string
           id?: string
           notes?: string | null
           phone?: string | null
+          tax_number?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          address?: string | null
+          city?: string | null
           created_at?: string
+          customer_type?: string
           email?: string | null
           full_name?: string
           id?: string
           notes?: string | null
           phone?: string | null
+          tax_number?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -120,25 +132,31 @@ export type Database = {
       invoices: {
         Row: {
           created_at: string
+          due_date: string | null
           id: string
           invoice_number: string
           issued_at: string
+          notes: string | null
           pdf_storage_path: string | null
           service_id: string
         }
         Insert: {
           created_at?: string
+          due_date?: string | null
           id?: string
           invoice_number: string
           issued_at?: string
+          notes?: string | null
           pdf_storage_path?: string | null
           service_id: string
         }
         Update: {
           created_at?: string
+          due_date?: string | null
           id?: string
           invoice_number?: string
           issued_at?: string
+          notes?: string | null
           pdf_storage_path?: string | null
           service_id?: string
         }
@@ -486,29 +504,44 @@ export type Database = {
       }
       users: {
         Row: {
+          address: string | null
+          authorized_signer: string | null
+          bank_account: string | null
+          bank_name: string | null
           created_at: string
           email: string | null
           full_name: string
           id: string
           phone: string | null
+          tax_id: string | null
           updated_at: string
           workshop_name: string | null
         }
         Insert: {
+          address?: string | null
+          authorized_signer?: string | null
+          bank_account?: string | null
+          bank_name?: string | null
           created_at?: string
           email?: string | null
           full_name: string
           id: string
           phone?: string | null
+          tax_id?: string | null
           updated_at?: string
           workshop_name?: string | null
         }
         Update: {
+          address?: string | null
+          authorized_signer?: string | null
+          bank_account?: string | null
+          bank_name?: string | null
           created_at?: string
           email?: string | null
           full_name?: string
           id?: string
           phone?: string | null
+          tax_id?: string | null
           updated_at?: string
           workshop_name?: string | null
         }
@@ -759,6 +792,7 @@ export type Database = {
           uncollected: number
         }[]
       }
+      get_next_invoice_number: { Args: never; Returns: string }
       get_part_rankings: {
         Args: {
           p_date_from: string
@@ -826,6 +860,8 @@ export type Database = {
           year_range: string
         }[]
       }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
       expense_category:

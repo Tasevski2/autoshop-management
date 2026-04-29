@@ -18,6 +18,10 @@ const customerSchema = z.object({
   full_name: z.string().min(1),
   phone: z.string().optional().transform((v) => v || null),
   email: z.string().email().optional().or(z.literal('')).transform((v) => v || null),
+  customer_type: z.enum(['person', 'company']),
+  address: z.string().optional().transform((v) => v || null),
+  city: z.string().optional().transform((v) => v || null),
+  tax_number: z.string().optional().transform((v) => v || null),
   notes: z.string().optional().transform((v) => v || null),
 })
 
@@ -44,9 +48,22 @@ export default function CustomerFormPage() {
           full_name: customer.full_name,
           phone: customer.phone ?? '',
           email: customer.email ?? '',
+          customer_type: (customer.customer_type as 'person' | 'company') ?? 'person',
+          address: customer.address ?? '',
+          city: customer.city ?? '',
+          tax_number: customer.tax_number ?? '',
           notes: customer.notes ?? '',
         }
-      : undefined,
+      : {
+          full_name: '',
+          phone: '',
+          email: '',
+          customer_type: 'person' as const,
+          address: '',
+          city: '',
+          tax_number: '',
+          notes: '',
+        },
   })
 
   const onSubmit = (data: CustomerFormData) => {
@@ -99,6 +116,36 @@ export default function CustomerFormPage() {
               {errors.email && (
                 <p className="text-sm text-destructive">{t('customers.emailInvalid')}</p>
               )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('customers.customerType')}</Label>
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2 text-sm">
+                  <input type="radio" value="person" {...register('customer_type')} />
+                  {t('customers.person')}
+                </label>
+                <label className="flex items-center gap-2 text-sm">
+                  <input type="radio" value="company" {...register('customer_type')} />
+                  {t('customers.company')}
+                </label>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="address">{t('customers.address')}</Label>
+                <Input id="address" {...register('address')} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="city">{t('customers.city')}</Label>
+                <Input id="city" {...register('city')} />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="tax_number">{t('customers.taxNumber')}</Label>
+              <Input id="tax_number" {...register('tax_number')} placeholder="ЕМБГ / ЕДБ" />
             </div>
 
             <div className="space-y-2">

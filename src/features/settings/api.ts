@@ -1,5 +1,34 @@
 import { supabase } from '@/lib/supabase'
-import type { VehicleBrandInsert, VehicleModelInsert } from './types'
+import type { VehicleBrandInsert, VehicleModelInsert, UserProfileUpdate } from './types'
+
+// ── User Profile (invoice settings) ──
+
+export async function fetchUserProfile() {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Not authenticated')
+
+  const { data, error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', user.id)
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function updateUserProfile(updates: UserProfileUpdate) {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Not authenticated')
+
+  const { data, error } = await supabase
+    .from('users')
+    .update(updates)
+    .eq('id', user.id)
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
 
 // ── Brands ──
 

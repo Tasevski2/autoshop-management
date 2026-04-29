@@ -28,7 +28,10 @@
     "actions": "Actions",
     "previous": "Previous",
     "next": "Next",
-    "page": "Page {{current}} of {{total}}"
+    "page": "Page {{current}} of {{total}}",
+    "required": "This field is required",
+    "saved": "Saved successfully",
+    "error": "An error occurred"
   },
   "theme": {
     "dark": "Dark Mode",
@@ -62,6 +65,12 @@
     "noNotes": "No notes",
     "nameRequired": "Name is required",
     "emailInvalid": "Invalid email address",
+    "customerType": "Customer Type",
+    "person": "Person",
+    "company": "Company",
+    "address": "Address",
+    "city": "City",
+    "taxNumber": "Tax Number",
     "vehiclesCount": "Vehicles",
     "totalRevenue": "Total Revenue",
     "totalVisits": "Total Visits",
@@ -186,6 +195,7 @@
     "paymentDate": "Date",
     "paymentNotes": "Notes",
     "generateInvoice": "Generate Invoice",
+    "labor": "Labor",
     "methods": {
       "cash": "Cash",
       "card": "Card",
@@ -255,7 +265,20 @@
     "partsCatalog": "Parts Catalog",
     "invoiceSettings": "Invoice Settings",
     "brandsModels": "Brands & Models",
-    "invoicePlaceholder": "Invoice settings coming soon."
+    "invoice": {
+      "workshopInfo": "Workshop Information",
+      "workshopName": "Workshop Name",
+      "ownerName": "Owner Name",
+      "address": "Address",
+      "phone": "Phone",
+      "email": "Email",
+      "financialInfo": "Financial Information",
+      "bankAccount": "Bank Account",
+      "bankName": "Bank Name",
+      "taxId": "Tax ID (ЕДБ)",
+      "signing": "Invoice Signing",
+      "authorizedSigner": "Authorized Signer"
+    }
   },
   "parts": {
     "name": "Part Name",
@@ -334,6 +357,37 @@
     "received": "Received",
     "spent": "Spent",
     "net": "Net"
+  },
+  "invoices": {
+    "title": "Invoices",
+    "editor": "Invoice Editor",
+    "preview": "Preview",
+    "lineItems": "Line Items",
+    "addRow": "Add Row",
+    "removeRow": "Remove",
+    "description": "Description",
+    "unit": "Unit",
+    "quantity": "Quantity",
+    "priceWithoutTax": "Price (no tax)",
+    "discountPercent": "Discount %",
+    "discount": "Discount",
+    "vatPercent": "VAT %",
+    "amountWithVat": "Amount (with VAT)",
+    "invoiceDate": "Invoice Date",
+    "dueDate": "Due Date (Valuta)",
+    "invoiceNumber": "Invoice No.",
+    "generatePdf": "Generate PDF",
+    "noInvoices": "No invoices yet",
+    "date": "Date",
+    "customer": "Customer",
+    "vehicle": "Vehicle",
+    "total": "Total",
+    "download": "Download",
+    "regenerate": "Regenerate",
+    "laborForVehicle": "Labor for vehicle {{plate}}",
+    "pc": "pc",
+    "dateFrom": "From",
+    "dateTo": "To"
   },
   "auth": {
     "login": "Log In",

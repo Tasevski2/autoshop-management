@@ -170,7 +170,7 @@ export default function ServiceDetailPage() {
               </option>
             ))}
           </select>
-          <Button variant="outline" size="sm" disabled>
+          <Button variant="outline" size="sm" render={<Link to={`/services/${id}/invoice`} />}>
             <FileText className="mr-2 h-3.5 w-3.5" />
             {t('services.generateInvoice')}
           </Button>

@@ -25,6 +25,8 @@ const BrandsModelsPage = lazy(() => import('@/features/settings/components/Brand
 const PaymentsListPage = lazy(() => import('@/features/payments/components/PaymentsListPage'))
 const PaymentFormPage = lazy(() => import('@/features/payments/components/PaymentFormPage'))
 const ReportsPage = lazy(() => import('@/features/reports/components/ReportsPage'))
+const InvoiceEditorPage = lazy(() => import('@/features/invoices/components/InvoiceEditorPage'))
+const InvoicesListPage = lazy(() => import('@/features/invoices/components/InvoicesPage'))
 
 function SuspenseWrapper({ children }: { children: React.ReactNode }) {
   return <Suspense fallback={null}>{children}</Suspense>
@@ -131,8 +133,12 @@ export const router = createBrowserRouter([
         element: <SuspenseWrapper><ServiceFormPage /></SuspenseWrapper>,
       },
       {
+        path: 'services/:id/invoice',
+        element: <SuspenseWrapper><InvoiceEditorPage /></SuspenseWrapper>,
+      },
+      {
         path: 'invoices',
-        element: <SuspenseWrapper><div className="text-2xl font-bold">Invoices</div></SuspenseWrapper>,
+        element: <SuspenseWrapper><InvoicesListPage /></SuspenseWrapper>,
       },
       {
         path: 'payments',
