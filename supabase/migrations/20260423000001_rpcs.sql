@@ -1,8 +1,45 @@
--- ============================================================
--- Server-side aggregation RPCs
--- Moves all frontend .reduce()/.filter() aggregations to Postgres
--- to avoid Supabase's 1000-row silent truncation.
--- ============================================================
+-- ============================================================================
+-- Car Workshop Management — Server-Side Functions (RPCs)
+-- ============================================================================
+
+-- ─── Invoice Number Management ───────────────────────────────
+
+-- Read-only: returns the current next invoice number without incrementing
+CREATE OR REPLACE FUNCTION public.get_next_invoice_number()
+RETURNS text
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  current_user_id uuid := auth.uid();
+  next_num int;
+BEGIN
+  SELECT next_invoice_number INTO next_num
+  FROM public.users
+  WHERE id = current_user_id;
+
+  RETURN LPAD(next_num::text, 4, '0');
+END;
+$$;
+
+-- Atomic increment: returns the number and advances the counter
+CREATE OR REPLACE FUNCTION public.consume_next_invoice_number()
+RETURNS text
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  current_user_id uuid := auth.uid();
+  next_num int;
+BEGIN
+  UPDATE public.users
+  SET next_invoice_number = next_invoice_number + 1
+  WHERE id = current_user_id
+  RETURNING next_invoice_number - 1 INTO next_num;
+
+  RETURN LPAD(next_num::text, 4, '0');
+END;
+$$;
 
 -- ─── Dashboard RPCs ──────────────────────────────────────────
 
@@ -206,7 +243,7 @@ AS $$
   ORDER BY ad.bucket_date DESC;
 $$;
 
--- ─── Reports — Revenue Trend RPC ─────────────────────────────
+-- ─── Reports — Revenue Trend ────────────────────────────────
 
 CREATE OR REPLACE FUNCTION public.get_revenue_trend()
 RETURNS TABLE (month text, total_revenue numeric, distinct_days bigint)
@@ -223,7 +260,7 @@ AS $$
   ORDER BY 1;
 $$;
 
--- ─── Reports — Customers Tab RPC ─────────────────────────────
+-- ─── Reports — Customers Tab ────────────────────────────────
 
 CREATE OR REPLACE FUNCTION public.get_customer_summary(p_from date, p_to date)
 RETURNS TABLE (active_count bigint, new_count bigint, avg_invoice numeric)
@@ -254,7 +291,87 @@ AS $$
   FROM active a, new_cust n, avg_inv ai;
 $$;
 
--- ─── Reports — Services Tab RPCs ─────────────────────────────
+CREATE OR REPLACE FUNCTION public.get_customer_rankings(
+  p_date_from date,
+  p_date_to date,
+  p_sort_column text DEFAULT 'total_revenue',
+  p_sort_direction text DEFAULT 'desc',
+  p_page integer DEFAULT 0,
+  p_page_size integer DEFAULT 20
+)
+RETURNS TABLE (
+  customer_id uuid,
+  full_name text,
+  phone text,
+  services_count bigint,
+  total_revenue numeric,
+  profit numeric,
+  collected numeric,
+  owes numeric,
+  total_count bigint
+)
+LANGUAGE sql STABLE SECURITY INVOKER
+AS $$
+  WITH customer_agg AS (
+    SELECT
+      c.id AS customer_id,
+      c.full_name,
+      c.phone,
+      COUNT(DISTINCT s.id) AS services_count,
+      COALESCE(SUM(st.service_total), 0) AS total_revenue,
+      COALESCE(SUM(st.service_total - st.parts_cost), 0) AS profit,
+      COALESCE(SUM(st.total_paid), 0) AS collected,
+      COALESCE(SUM(st.balance_due), 0) AS owes
+    FROM public.services s
+    JOIN public.vehicles v ON v.id = s.vehicle_id
+    JOIN public.customers c ON c.id = v.customer_id
+    LEFT JOIN public.service_totals st ON st.service_id = s.id
+    WHERE s.service_date >= p_date_from
+      AND s.service_date <= p_date_to
+    GROUP BY c.id, c.full_name, c.phone
+  ),
+  counted AS (
+    SELECT *, COUNT(*) OVER () AS total_count
+    FROM customer_agg
+  )
+  SELECT
+    counted.customer_id,
+    counted.full_name,
+    counted.phone,
+    counted.services_count,
+    counted.total_revenue,
+    counted.profit,
+    counted.collected,
+    counted.owes,
+    counted.total_count
+  FROM counted
+  ORDER BY
+    CASE WHEN p_sort_direction = 'desc' THEN
+      CASE p_sort_column
+        WHEN 'services_count' THEN counted.services_count
+        WHEN 'total_revenue' THEN counted.total_revenue
+        WHEN 'profit' THEN counted.profit
+        WHEN 'collected' THEN counted.collected
+        WHEN 'owes' THEN counted.owes
+      END
+    END DESC NULLS LAST,
+    CASE WHEN p_sort_direction = 'asc' THEN
+      CASE p_sort_column
+        WHEN 'services_count' THEN counted.services_count
+        WHEN 'total_revenue' THEN counted.total_revenue
+        WHEN 'profit' THEN counted.profit
+        WHEN 'collected' THEN counted.collected
+        WHEN 'owes' THEN counted.owes
+      END
+    END ASC NULLS LAST,
+    CASE WHEN p_sort_column = 'full_name' AND p_sort_direction = 'desc' THEN counted.full_name END DESC NULLS LAST,
+    CASE WHEN p_sort_column = 'full_name' AND p_sort_direction = 'asc' THEN counted.full_name END ASC NULLS LAST,
+    counted.full_name ASC
+  LIMIT p_page_size
+  OFFSET p_page * p_page_size;
+$$;
+
+-- ─── Reports — Services Tab ─────────────────────────────────
 
 CREATE OR REPLACE FUNCTION public.get_services_summary(p_from date, p_to date)
 RETURNS TABLE (total_services bigint, avg_parts_per_service numeric, avg_labor numeric)
@@ -276,6 +393,73 @@ AS $$
     CASE WHEN sv.total > 0 THEN ROUND(p.total::numeric / sv.total, 1) ELSE 0 END AS avg_parts_per_service,
     CASE WHEN sv.total > 0 THEN ROUND(sv.total_labor / sv.total) ELSE 0 END AS avg_labor
   FROM svc sv, parts p;
+$$;
+
+CREATE OR REPLACE FUNCTION public.get_part_rankings(
+  p_date_from date,
+  p_date_to date,
+  p_sort_column text DEFAULT 'qty_sold',
+  p_sort_direction text DEFAULT 'desc',
+  p_page integer DEFAULT 0,
+  p_page_size integer DEFAULT 20
+)
+RETURNS TABLE (
+  part_name text,
+  qty_sold bigint,
+  buy_cost_total numeric,
+  sell_total numeric,
+  profit numeric,
+  total_count bigint
+)
+LANGUAGE sql STABLE SECURITY INVOKER
+AS $$
+  WITH part_agg AS (
+    SELECT
+      MIN(sp.name) AS part_name,
+      SUM(sp.quantity)::bigint AS qty_sold,
+      COALESCE(SUM(sp.buy_price * sp.quantity), 0) AS buy_cost_total,
+      COALESCE(SUM(sp.sell_price * sp.quantity), 0) AS sell_total,
+      COALESCE(SUM(sp.sell_price * sp.quantity), 0) - COALESCE(SUM(sp.buy_price * sp.quantity), 0) AS profit
+    FROM public.service_parts sp
+    JOIN public.services s ON s.id = sp.service_id
+    WHERE s.service_date >= p_date_from
+      AND s.service_date <= p_date_to
+    GROUP BY LOWER(TRIM(sp.name))
+  ),
+  counted AS (
+    SELECT *, COUNT(*) OVER () AS total_count
+    FROM part_agg
+  )
+  SELECT
+    counted.part_name,
+    counted.qty_sold,
+    counted.buy_cost_total,
+    counted.sell_total,
+    counted.profit,
+    counted.total_count
+  FROM counted
+  ORDER BY
+    CASE WHEN p_sort_direction = 'desc' THEN
+      CASE p_sort_column
+        WHEN 'qty_sold' THEN counted.qty_sold
+        WHEN 'buy_cost_total' THEN counted.buy_cost_total
+        WHEN 'sell_total' THEN counted.sell_total
+        WHEN 'profit' THEN counted.profit
+      END
+    END DESC NULLS LAST,
+    CASE WHEN p_sort_direction = 'asc' THEN
+      CASE p_sort_column
+        WHEN 'qty_sold' THEN counted.qty_sold
+        WHEN 'buy_cost_total' THEN counted.buy_cost_total
+        WHEN 'sell_total' THEN counted.sell_total
+        WHEN 'profit' THEN counted.profit
+      END
+    END ASC NULLS LAST,
+    CASE WHEN p_sort_column = 'part_name' AND p_sort_direction = 'desc' THEN counted.part_name END DESC NULLS LAST,
+    CASE WHEN p_sort_column = 'part_name' AND p_sort_direction = 'asc' THEN counted.part_name END ASC NULLS LAST,
+    counted.part_name ASC
+  LIMIT p_page_size
+  OFFSET p_page * p_page_size;
 $$;
 
 CREATE OR REPLACE FUNCTION public.get_brand_distribution(p_from date, p_to date)
@@ -361,4 +545,32 @@ AS $$
     AND (p_date_from IS NULL OR e.expense_date >= p_date_from)
     AND (p_date_to IS NULL OR e.expense_date <= p_date_to)
   GROUP BY e.category;
+$$;
+
+-- ─── Notification Generator ─────────────────────────────────
+
+CREATE OR REPLACE FUNCTION public.generate_reminder_notifications()
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+    INSERT INTO public.notifications (user_id, reminder_id, type, title, message)
+    SELECT
+        c.user_id,
+        r.id,
+        'upcoming_service'::notification_type,
+        v.brand || ' ' || COALESCE(v.model, '') || ' (' || v.plate_number || ')',
+        COALESCE(r.note, 'Scheduled service is approaching')
+    FROM public.reminders r
+    JOIN public.vehicles v ON v.id = r.vehicle_id
+    JOIN public.customers c ON c.id = v.customer_id
+    WHERE r.is_active = TRUE
+      AND (r.due_date - r.notify_days_before * INTERVAL '1 day') <= CURRENT_DATE
+      AND NOT EXISTS (
+          SELECT 1 FROM public.notifications n
+          WHERE n.reminder_id = r.id
+            AND n.is_dismissed = FALSE
+      );
+END;
 $$;
