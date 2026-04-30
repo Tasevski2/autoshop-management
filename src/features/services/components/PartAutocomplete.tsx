@@ -104,6 +104,17 @@ export default function PartAutocomplete({ value, onChange, onSelect }: PartAuto
           setOpen(true)
         }}
         onFocus={() => setOpen(true)}
+        onKeyDown={(e) => {
+          if (e.key === 'Tab' && open && options.length > 0) {
+            e.preventDefault()
+            onSelect({
+              name: options[0].name,
+              buy_price: options[0].buy_price,
+              sell_price: options[0].sell_price,
+            })
+            setOpen(false)
+          }
+        }}
         placeholder={t('services.searchPart')}
       />
       {dropdown}

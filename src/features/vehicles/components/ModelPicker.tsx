@@ -124,6 +124,14 @@ export default function ModelPicker({ value, displayName, onChange, brandName }:
           if (!disabled) setOpen(true)
         }}
         onFocus={() => { if (!disabled) setOpen(true) }}
+        onKeyDown={(e) => {
+          if (e.key === 'Tab' && open && filtered.length > 0) {
+            e.preventDefault()
+            onChange(filtered[0].name)
+            setSearch('')
+            setOpen(false)
+          }
+        }}
         placeholder={t('vehicles.searchModel')}
         disabled={disabled}
       />

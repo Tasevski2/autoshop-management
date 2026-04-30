@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { Users, UserPlus, Receipt } from 'lucide-react'
+import { Users, Receipt } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import CustomerRankingsTable from './CustomerRankingsTable'
 import { useCustomerSummary } from '../hooks/useReports'
@@ -18,8 +18,8 @@ export default function CustomersTab({ dateFrom, dateTo }: Props) {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-          {[1, 2, 3].map((i) => (
+        <div className="grid grid-cols-2 gap-3">
+          {[1, 2].map((i) => (
             <Card key={i} size="sm">
               <CardContent>
                 <div className="h-16 animate-pulse rounded bg-muted" />
@@ -45,13 +45,6 @@ export default function CustomersTab({ dateFrom, dateTo }: Props) {
       bg: 'bg-blue-50 dark:bg-blue-950',
     },
     {
-      label: t('reports.customers.new'),
-      value: summary.newCount.toString(),
-      icon: UserPlus,
-      color: 'text-green-600 dark:text-green-400',
-      bg: 'bg-green-50 dark:bg-green-950',
-    },
-    {
       label: t('reports.customers.avgInvoice'),
       value: `${formatMoney(summary.avgInvoice)} ден.`,
       icon: Receipt,
@@ -62,7 +55,7 @@ export default function CustomersTab({ dateFrom, dateTo }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 gap-3">
         {cards.map((card) => (
           <Card key={card.label} size="sm">
             <CardContent className="flex items-start gap-3">

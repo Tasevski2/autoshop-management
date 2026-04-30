@@ -65,6 +65,12 @@ export async function getNextInvoiceNumber() {
   return data as string
 }
 
+export async function consumeNextInvoiceNumber() {
+  const { data, error } = await supabase.rpc('consume_next_invoice_number')
+  if (error) throw error
+  return data as string
+}
+
 export async function createInvoiceRecord(invoice: InvoiceInsert) {
   const { data, error } = await supabase
     .from('invoices')
@@ -84,6 +90,14 @@ export async function updateInvoiceRecord(id: string, updates: Partial<InvoiceIn
     .single()
   if (error) throw error
   return data
+}
+
+export async function deleteInvoiceRecord(id: string) {
+  const { error } = await supabase
+    .from('invoices')
+    .delete()
+    .eq('id', id)
+  if (error) throw error
 }
 
 export async function fetchInvoices({

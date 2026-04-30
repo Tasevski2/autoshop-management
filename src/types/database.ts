@@ -512,6 +512,7 @@ export type Database = {
           email: string | null
           full_name: string
           id: string
+          next_invoice_number: number
           phone: string | null
           tax_id: string | null
           updated_at: string
@@ -526,6 +527,7 @@ export type Database = {
           email?: string | null
           full_name: string
           id: string
+          next_invoice_number?: number
           phone?: string | null
           tax_id?: string | null
           updated_at?: string
@@ -540,6 +542,7 @@ export type Database = {
           email?: string | null
           full_name?: string
           id?: string
+          next_invoice_number?: number
           phone?: string | null
           tax_id?: string | null
           updated_at?: string
@@ -717,6 +720,7 @@ export type Database = {
       }
     }
     Functions: {
+      consume_next_invoice_number: { Args: never; Returns: string }
       generate_reminder_notifications: { Args: never; Returns: undefined }
       get_brand_distribution: {
         Args: { p_from: string; p_to: string }

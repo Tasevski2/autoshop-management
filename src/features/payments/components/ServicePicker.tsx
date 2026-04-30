@@ -214,6 +214,21 @@ export default function ServicePicker({ value, onChange }: ServicePickerProps) {
         onFocus={() => {
           if (search.length >= 2) setOpen(true)
         }}
+        onKeyDown={(e) => {
+          if (e.key === 'Tab' && open && vehicleOptions.length > 0) {
+            e.preventDefault()
+            const v = vehicleOptions[0]
+            setSelectedVehicle({
+              id: v.id,
+              plate_number: v.plate_number,
+              brand: v.brand,
+              model: v.model,
+              customers: v.customers as { full_name: string } | null,
+            })
+            setSearch('')
+            setOpen(false)
+          }
+        }}
         placeholder={t('payments.searchVehicle')}
       />
       {dropdown}

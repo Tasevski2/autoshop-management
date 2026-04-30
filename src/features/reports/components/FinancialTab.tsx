@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { DollarSign, Package, Building2, TrendingUp } from 'lucide-react'
+import { DollarSign, Package, TrendingUp, Building2, ArrowUpRight } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import RevenueChart from './RevenueChart'
 import ExpensesPaymentsRow from './ExpensesPaymentsRow'
@@ -33,8 +33,8 @@ export default function FinancialTab({ dateFrom, dateTo }: Props) {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {[1, 2, 3, 4].map((i) => (
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+          {[1, 2, 3, 4, 5].map((i) => (
             <Card key={i} size="sm">
               <CardContent>
                 <div className="h-16 animate-pulse rounded bg-muted" />
@@ -67,11 +67,18 @@ export default function FinancialTab({ dateFrom, dateTo }: Props) {
       bg: 'bg-orange-50 dark:bg-orange-950',
     },
     {
+      label: t('reports.financial.partsProfit'),
+      value: `${formatMoney(summary.partsProfit)} ден.`,
+      icon: ArrowUpRight,
+      color: summary.partsProfit >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400',
+      bg: summary.partsProfit >= 0 ? 'bg-emerald-50 dark:bg-emerald-950' : 'bg-red-50 dark:bg-red-950',
+    },
+    {
       label: t('reports.financial.operatingExpenses'),
       value: `${formatMoney(summary.operatingExpenses)} ден.`,
       icon: Building2,
-      color: 'text-red-600 dark:text-red-400',
-      bg: 'bg-red-50 dark:bg-red-950',
+      color: summary.operatingExpenses > 0 ? 'text-red-600 dark:text-red-400' : 'text-muted-foreground',
+      bg: summary.operatingExpenses > 0 ? 'bg-red-50 dark:bg-red-950' : 'bg-muted',
     },
     {
       label: t('reports.financial.netProfit'),
@@ -85,7 +92,7 @@ export default function FinancialTab({ dateFrom, dateTo }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         {cards.map((card) => (
           <Card key={card.label} size="sm">
             <CardContent className="flex items-start gap-3">

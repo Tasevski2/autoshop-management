@@ -1,10 +1,18 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
 import { useTranslation } from 'react-i18next'
-import { FileText } from 'lucide-react'
+import { FileText, RotateCw, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import {
   Table,
   TableBody,
@@ -13,15 +21,24 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useInvoices } from '@/features/invoices/hooks/useInvoices'
+import { useInvoices, useDeleteInvoice } from '@/features/invoices/hooks/useInvoices'
 
 export default function InvoicesPage() {
   const { t } = useTranslation()
   const [page, setPage] = useState(0)
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
 
   const { data, isLoading } = useInvoices({ page, dateFrom: dateFrom || undefined, dateTo: dateTo || undefined })
+  const deleteMutation = useDeleteInvoice()
+
+  const confirmDelete = () => {
+    if (!deleteTarget) return
+    deleteMutation.mutate(deleteTarget, {
+      onSuccess: () => setDeleteTarget(null),
+    })
+  }
   const invoices = data?.data ?? []
   const totalPages = data?.totalPages ?? 0
 
@@ -101,11 +118,21 @@ export default function InvoicesPage() {
                         {inv.service_total != null ? `${inv.service_total.toLocaleString()} ден` : '—'}
                       </TableCell>
                       <TableCell>
-                        {svc && (
-                          <Button variant="ghost" size="sm" render={<Link to={`/services/${svc.id}/invoice`} />}>
-                            {t('invoices.regenerate')}
+                        <div className="flex items-center gap-1">
+                          {svc && (
+                            <Button variant="outline" size="sm" render={<Link to={`/services/${svc.id}/invoice`} />}>
+                              <RotateCw className="mr-1 h-3.5 w-3.5" />
+                              {t('invoices.regenerate')}
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="icon-xs"
+                            onClick={() => setDeleteTarget(inv.id)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5 text-destructive" />
                           </Button>
-                        )}
+                        </div>
                       </TableCell>
                     </TableRow>
                   )
@@ -142,6 +169,24 @@ export default function InvoicesPage() {
           )}
         </>
       )}
+
+      {/* Delete confirmation dialog */}
+      <Dialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null) }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('common.delete')}</DialogTitle>
+            <DialogDescription>{t('invoices.deleteConfirm')}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteTarget(null)}>
+              {t('common.cancel')}
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete} disabled={deleteMutation.isPending}>
+              {t('common.delete')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

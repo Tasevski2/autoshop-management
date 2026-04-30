@@ -27,8 +27,8 @@ export default function RevenueChart({ data }: Props) {
             <Tooltip
               {...tooltipStyle}
               cursor={cursorStyle}
-              formatter={(value: number, name: string) => [
-                `${formatMoney(value)} ден.`,
+              formatter={(value, name) => [
+                `${formatMoney(Number(value))} ден.`,
                 name === 'partsRevenue' ? t('reports.financial.partsRevenue') : t('reports.financial.labor'),
               ]}
               labelFormatter={(label) => label}

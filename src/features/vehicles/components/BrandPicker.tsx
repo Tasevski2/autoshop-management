@@ -124,6 +124,14 @@ export default function BrandPicker({ value, displayName, onChange }: BrandPicke
           setOpen(true)
         }}
         onFocus={() => setOpen(true)}
+        onKeyDown={(e) => {
+          if (e.key === 'Tab' && open && filtered.length > 0) {
+            e.preventDefault()
+            onChange(filtered[0].name)
+            setSearch('')
+            setOpen(false)
+          }
+        }}
         placeholder={t('vehicles.searchBrand')}
       />
       {dropdown}

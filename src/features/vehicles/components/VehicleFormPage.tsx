@@ -60,8 +60,8 @@ export default function VehicleFormPage() {
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<VehicleFormData>({
-    resolver: zodResolver(vehicleSchema),
-    values: isEdit && vehicle
+    resolver: zodResolver(vehicleSchema) as never,
+    values: (isEdit && vehicle
       ? {
           plate_number: vehicle.plate_number,
           brand: vehicle.brand,
@@ -77,7 +77,7 @@ export default function VehicleFormPage() {
         }
       : presetCustomerId
         ? { customer_id: presetCustomerId, plate_number: '', brand: '' }
-        : undefined,
+        : undefined) as VehicleFormData | undefined,
   })
 
   const onSubmit = (data: VehicleFormData) => {
@@ -86,7 +86,7 @@ export default function VehicleFormPage() {
       void customer_id
       updateMutation.mutate(updates)
     } else {
-      createMutation.mutate(data as VehicleFormData & { customer_id: string })
+      createMutation.mutate(data)
     }
   }
 
@@ -116,7 +116,7 @@ export default function VehicleFormPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit as never)} className="space-y-4">
             {/* Customer picker */}
             <div className="space-y-2">
               <Label>{t('vehicles.owner')} *</Label>

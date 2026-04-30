@@ -3,6 +3,7 @@
 export interface FinancialSummary {
   totalRevenue: number
   partsCost: number
+  partsProfit: number
   operatingExpenses: number
   netProfit: number
   margin: number

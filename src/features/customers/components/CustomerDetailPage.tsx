@@ -14,6 +14,8 @@ import {
   Trash2,
   ChevronLeft,
   ChevronRight,
+  User,
+  Building2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -115,7 +117,17 @@ export default function CustomerDetailPage() {
         {/* Contact info */}
         <Card>
           <CardContent className="pt-6">
-            <h2 className="text-xl font-bold">{customer.full_name}</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-xl font-bold">{customer.full_name}</h2>
+              <Badge variant="secondary" className="shrink-0">
+                {customer.customer_type === 'company' ? (
+                  <Building2 className="mr-1 h-3 w-3" />
+                ) : (
+                  <User className="mr-1 h-3 w-3" />
+                )}
+                {t(`customers.${customer.customer_type === 'company' ? 'company' : 'person'}`)}
+              </Badge>
+            </div>
             <div className="mt-3 space-y-2">
               {customer.phone && (
                 <a

@@ -125,6 +125,7 @@ export function useUpdateService(id: string) {
       queryClient.invalidateQueries({ queryKey: ['services'] })
       queryClient.invalidateQueries({ queryKey: ['service-parts', 'by-service', id] })
       queryClient.invalidateQueries({ queryKey: ['service-totals', id] })
+      queryClient.invalidateQueries({ queryKey: ['invoices'] })
       queryClient.invalidateQueries({ queryKey: ['dashboard', 'in-progress'] })
       queryClient.invalidateQueries({ queryKey: ['dashboard', 'stats'] })
       queryClient.invalidateQueries({ queryKey: ['dashboard', 'unpaid'] })
@@ -142,6 +143,7 @@ export function useUpdateServiceStatus(id: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['services'] })
       queryClient.invalidateQueries({ queryKey: ['services', 'detail', id] })
+      queryClient.invalidateQueries({ queryKey: ['invoices'] })
       queryClient.invalidateQueries({ queryKey: ['dashboard', 'in-progress'] })
       queryClient.invalidateQueries({ queryKey: ['dashboard', 'stats'] })
       queryClient.invalidateQueries({ queryKey: ['dashboard', 'unpaid'] })
@@ -162,6 +164,7 @@ export function useDeleteService() {
       queryClient.invalidateQueries({ queryKey: ['service-images', 'by-service', id] })
       queryClient.invalidateQueries({ queryKey: ['payments', 'by-service', id] })
       queryClient.invalidateQueries({ queryKey: ['service-totals', id] })
+      queryClient.invalidateQueries({ queryKey: ['invoices'] })
       queryClient.invalidateQueries({ queryKey: ['dashboard', 'in-progress'] })
       queryClient.invalidateQueries({ queryKey: ['dashboard', 'stats'] })
       queryClient.invalidateQueries({ queryKey: ['dashboard', 'unpaid'] })

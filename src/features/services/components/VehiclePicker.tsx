@@ -150,6 +150,15 @@ export default function VehiclePicker({ value, displayName, onChange, disabled }
         onFocus={() => {
           if (search.length >= 2) setOpen(true)
         }}
+        onKeyDown={(e) => {
+          if (e.key === 'Tab' && open && options.length > 0) {
+            e.preventDefault()
+            const v = options[0]
+            onChange(v.id, v as VehicleOption)
+            setSearch('')
+            setOpen(false)
+          }
+        }}
         placeholder={t('services.searchVehicle')}
         disabled={disabled}
       />

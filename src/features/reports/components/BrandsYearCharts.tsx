@@ -27,7 +27,7 @@ export default function BrandsYearCharts({ brands, yearRanges }: Props) {
               <BarChart data={brands} layout="vertical" margin={{ left: 80 }}>
                 <XAxis type="number" tick={{ fontSize: 12 }} allowDecimals={false} />
                 <YAxis type="category" dataKey="brand" tick={{ fontSize: 12 }} width={75} />
-                <Tooltip {...tooltipStyle} cursor={cursorStyle} formatter={(value: number) => [value, t('reports.services.total')]} />
+                <Tooltip {...tooltipStyle} cursor={cursorStyle} formatter={(value) => [Number(value), t('reports.services.total')]} />
                 <Bar dataKey="count" fill="var(--chart-1)" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -48,7 +48,7 @@ export default function BrandsYearCharts({ brands, yearRanges }: Props) {
               <BarChart data={yearRanges}>
                 <XAxis dataKey="range" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
-                <Tooltip {...tooltipStyle} cursor={cursorStyle} formatter={(value: number) => [value, t('reports.services.total')]} />
+                <Tooltip {...tooltipStyle} cursor={cursorStyle} formatter={(value) => [Number(value), t('reports.services.total')]} />
                 <Bar dataKey="count" fill="var(--chart-2)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>

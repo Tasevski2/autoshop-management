@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { useTranslation } from 'react-i18next'
-import { Plus, Search, ChevronLeft, ChevronRight, Pencil, Trash2, Users } from 'lucide-react'
+import { Plus, Search, ChevronLeft, ChevronRight, Pencil, Trash2, Users, User, Building2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -20,6 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
 import { useCustomers, useDeleteCustomer } from '@/features/customers/hooks/useCustomers'
 
 export default function CustomersListPage() {
@@ -92,6 +93,7 @@ export default function CustomersListPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>{t('customers.name')}</TableHead>
+                  <TableHead>{t('customers.customerType')}</TableHead>
                   <TableHead>{t('customers.phone')}</TableHead>
                   <TableHead className="text-center">{t('customers.vehiclesCount')}</TableHead>
                   <TableHead>{t('customers.notes')}</TableHead>
@@ -102,6 +104,16 @@ export default function CustomersListPage() {
                 {customers.map((c) => (
                     <TableRow key={c.id} className="cursor-pointer" onClick={() => navigate(`/customers/${c.id}`)}>
                       <TableCell className="font-medium">{c.full_name}</TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className="text-xs">
+                          {c.customer_type === 'company' ? (
+                            <Building2 className="mr-1 h-3 w-3" />
+                          ) : (
+                            <User className="mr-1 h-3 w-3" />
+                          )}
+                          {t(`customers.${c.customer_type === 'company' ? 'company' : 'person'}`)}
+                        </Badge>
+                      </TableCell>
                       <TableCell>{c.phone ?? '—'}</TableCell>
                       <TableCell className="text-center">{getVehicleCount(c)}</TableCell>
                       <TableCell className="max-w-xs truncate">{c.notes ?? '—'}</TableCell>

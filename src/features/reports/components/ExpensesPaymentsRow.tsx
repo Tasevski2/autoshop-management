@@ -70,7 +70,7 @@ export default function ExpensesPaymentsRow({ expenses, payments, totalInvoiced,
                   <Tooltip
                     {...tooltipStyle}
                     cursor={cursorStyle}
-                    formatter={(value: number) => [`${formatMoney(value)} ден.`]}
+                    formatter={(value) => [`${formatMoney(Number(value))} ден.`]}
                     labelFormatter={(label) => categoryLabels[label] ?? label}
                   />
                   <Bar dataKey="amount" fill="var(--chart-3)" radius={[0, 4, 4, 0]} />
@@ -99,7 +99,7 @@ export default function ExpensesPaymentsRow({ expenses, payments, totalInvoiced,
             <p className="text-sm text-muted-foreground py-8 text-center">{t('reports.noData')}</p>
           ) : (
             <>
-              <ResponsiveContainer width="100%" height={220}>
+              <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
                   <Pie
                     data={payments}
@@ -108,17 +108,17 @@ export default function ExpensesPaymentsRow({ expenses, payments, totalInvoiced,
                     cx="50%"
                     cy="50%"
                     innerRadius={55}
-                    outerRadius={90}
+                    outerRadius={85}
                     paddingAngle={2}
-                    label={({ method, amount }) =>
-                      `${methodLabels[method] ?? method}: ${formatMoney(amount)}`
+                    label={({ name, value }) =>
+                      `${methodLabels[name as string] ?? name}: ${formatMoney(Number(value))}`
                     }
                   >
                     {payments.map((_, i) => (
                       <Cell key={i} fill={DONUT_COLORS[i % DONUT_COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip {...tooltipStyle} formatter={(value: number) => [`${formatMoney(value)} ден.`]} />
+                  <Tooltip {...tooltipStyle} formatter={(value) => [`${formatMoney(Number(value))} ден.`]} />
                 </PieChart>
               </ResponsiveContainer>
 

@@ -71,8 +71,8 @@ export default function ServiceFormPage() {
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<ServiceFormData>({
-    resolver: zodResolver(serviceSchema),
-    values: isEdit && service
+    resolver: zodResolver(serviceSchema) as never,
+    values: (isEdit && service
       ? {
           service_date: service.service_date,
           mileage_at_service: service.mileage_at_service ?? undefined,
@@ -97,7 +97,7 @@ export default function ServiceFormPage() {
           status: 'in_progress',
           vehicle_id: presetVehicleId ?? '',
           parts: [{ name: '', buy_price: 0, sell_price: 0, quantity: 1, catalog_part_id: null }],
-        },
+        }) as ServiceFormData,
   })
 
   const { fields, append, remove } = useFieldArray({
@@ -219,7 +219,7 @@ export default function ServiceFormPage() {
         </Card>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit as never)} className="space-y-6">
         {/* Vehicle picker (only on create without preset) */}
         {!isEdit && !presetVehicleId && (
           <Card>
@@ -228,7 +228,7 @@ export default function ServiceFormPage() {
             </CardHeader>
             <CardContent>
               <VehiclePicker
-                value={watchedParts ? undefined : null}
+                value={null}
                 displayName={vehicleDisplay}
                 onChange={(vehicleId, vehicle) => {
                   setValue('vehicle_id', vehicleId, { shouldValidate: true })

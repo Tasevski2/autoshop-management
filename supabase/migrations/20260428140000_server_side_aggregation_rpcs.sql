@@ -39,6 +39,7 @@ CREATE OR REPLACE FUNCTION public.get_financial_summary(p_from date, p_to date)
 RETURNS TABLE (
   total_revenue numeric,
   parts_cost numeric,
+  parts_profit numeric,
   operating_expenses numeric,
   net_profit numeric,
   margin numeric,
@@ -50,6 +51,7 @@ AS $$
   WITH service_sums AS (
     SELECT
       COALESCE(SUM(st.service_total), 0) AS total_revenue,
+      COALESCE(SUM(st.parts_total), 0) AS parts_sell,
       COALESCE(SUM(st.parts_cost), 0) AS parts_cost,
       COALESCE(SUM(st.total_paid), 0) AS total_collected,
       COALESCE(SUM(st.balance_due), 0) AS uncollected
@@ -65,6 +67,7 @@ AS $$
   SELECT
     ss.total_revenue,
     ss.parts_cost,
+    ss.parts_sell - ss.parts_cost AS parts_profit,
     es.operating_expenses,
     ss.total_revenue - ss.parts_cost - es.operating_expenses AS net_profit,
     CASE WHEN ss.total_revenue > 0

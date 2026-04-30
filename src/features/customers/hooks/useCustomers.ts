@@ -63,6 +63,7 @@ export function useUpdateCustomer(id: string) {
     mutationFn: (data: CustomerUpdate) => updateCustomer(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] })
+      queryClient.invalidateQueries({ queryKey: ['invoices'] })
       navigate(`/customers/${id}`)
     },
   })

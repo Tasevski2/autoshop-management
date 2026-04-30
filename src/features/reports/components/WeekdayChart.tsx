@@ -26,7 +26,7 @@ export default function WeekdayChart({ data }: Props) {
             <Tooltip
               {...tooltipStyle}
               cursor={cursorStyle}
-              formatter={(value: number) => [value.toFixed(1), t('reports.services.avgServicesPerDay')]}
+              formatter={(value) => [Number(value).toFixed(1), t('reports.services.avgServicesPerDay')]}
             />
             <Bar dataKey="avgServices" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
           </BarChart>

@@ -35,13 +35,14 @@ export async function fetchFinancialSummary(
 
   if (error) throw error
   if (!data || data.length === 0) {
-    return { totalRevenue: 0, partsCost: 0, operatingExpenses: 0, netProfit: 0, margin: 0, totalCollected: 0, uncollected: 0 }
+    return { totalRevenue: 0, partsCost: 0, partsProfit: 0, operatingExpenses: 0, netProfit: 0, margin: 0, totalCollected: 0, uncollected: 0 }
   }
 
   const r = data[0]
   return {
     totalRevenue: Number(r.total_revenue),
     partsCost: Number(r.parts_cost),
+    partsProfit: Number(r.parts_profit),
     operatingExpenses: Number(r.operating_expenses),
     netProfit: Number(r.net_profit),
     margin: Number(r.margin),

@@ -40,10 +40,8 @@ export default function UnpaidServices() {
                     {s.vehicle?.plate_number} — {s.service_date}
                   </p>
                 </div>
-                <Button variant="ghost" size="icon-xs" asChild>
-                  <Link to={`/services/${s.id}`}>
+                <Button variant="ghost" size="icon-xs" render={<Link to={`/services/${s.id}`} />}>
                     <ChevronRight className="h-4 w-4" />
-                  </Link>
                 </Button>
               </div>
               <div className="flex items-center gap-2 text-xs">

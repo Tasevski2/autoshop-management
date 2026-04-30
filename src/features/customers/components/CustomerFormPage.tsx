@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, User, Building2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -40,9 +40,11 @@ export default function CustomerFormPage() {
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<CustomerFormData>({
-    resolver: zodResolver(customerSchema),
+    resolver: zodResolver(customerSchema) as never,
     values: isEdit && customer
       ? {
           full_name: customer.full_name,
@@ -96,7 +98,7 @@ export default function CustomerFormPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit as never)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="full_name">{t('customers.name')} *</Label>
               <Input id="full_name" {...register('full_name')} />
@@ -120,15 +122,25 @@ export default function CustomerFormPage() {
 
             <div className="space-y-2">
               <Label>{t('customers.customerType')}</Label>
-              <div className="flex gap-4">
-                <label className="flex items-center gap-2 text-sm">
-                  <input type="radio" value="person" {...register('customer_type')} />
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant={watch('customer_type') === 'person' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setValue('customer_type', 'person')}
+                >
+                  <User className="mr-1.5 h-3.5 w-3.5" />
                   {t('customers.person')}
-                </label>
-                <label className="flex items-center gap-2 text-sm">
-                  <input type="radio" value="company" {...register('customer_type')} />
+                </Button>
+                <Button
+                  type="button"
+                  variant={watch('customer_type') === 'company' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setValue('customer_type', 'company')}
+                >
+                  <Building2 className="mr-1.5 h-3.5 w-3.5" />
                   {t('customers.company')}
-                </label>
+                </Button>
               </div>
             </div>
 

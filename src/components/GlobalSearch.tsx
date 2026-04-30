@@ -95,6 +95,16 @@ export default function GlobalSearch() {
           ref={inputRef}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Tab' && showDropdown && hasResults) {
+              e.preventDefault()
+              const first = customers[0] || vehicles[0] || services[0]
+              if (!first) return
+              if (customers[0]) handleSelect(`/customers/${customers[0].id}`)
+              else if (vehicles[0]) handleSelect(`/vehicles/${vehicles[0].id}`)
+              else if (services[0]) handleSelect(`/services/${services[0].id}`)
+            }
+          }}
           placeholder={t('search.placeholder')}
           className="pl-10 h-9 md:h-10"
         />

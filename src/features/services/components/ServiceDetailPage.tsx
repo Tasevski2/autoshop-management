@@ -271,7 +271,7 @@ export default function ServiceDetailPage() {
               </div>
               <div className="flex justify-between font-medium">
                 <dt>{t('services.balance')}</dt>
-                <dd className={totals.balance_due != null && totals.balance_due > 0 ? 'text-destructive' : ''}>
+                <dd className={totals.balance_due != null && totals.balance_due > 0 ? 'text-destructive font-bold' : 'text-emerald-600 dark:text-emerald-400 font-bold'}>
                   {totals.balance_due != null ? `${totals.balance_due.toLocaleString()} ден` : '0 ден'}
                 </dd>
               </div>

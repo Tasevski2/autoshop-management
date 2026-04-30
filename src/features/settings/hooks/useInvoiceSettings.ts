@@ -19,6 +19,7 @@ export function useUpdateUserProfile() {
     mutationFn: (updates: UserProfileUpdate) => updateUserProfile(updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user'] })
+      queryClient.invalidateQueries({ queryKey: ['invoices'] })
       toast.success(t('common.saved'))
     },
     onError: () => {

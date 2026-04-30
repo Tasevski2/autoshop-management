@@ -277,7 +277,10 @@
       "bankName": "Bank Name",
       "taxId": "Tax ID (ЕДБ)",
       "signing": "Invoice Signing",
-      "authorizedSigner": "Authorized Signer"
+      "authorizedSigner": "Authorized Signer",
+      "invoiceNumbering": "Invoice Numbering",
+      "nextInvoiceNumber": "Next Invoice Number",
+      "nextInvoiceNumberHint": "The next invoice will use this number"
     }
   },
   "parts": {
@@ -376,7 +379,7 @@
     "invoiceDate": "Invoice Date",
     "dueDate": "Due Date (Valuta)",
     "invoiceNumber": "Invoice No.",
-    "generatePdf": "Generate PDF",
+    "generatePdf": "Save & Generate PDF",
     "noInvoices": "No invoices yet",
     "date": "Date",
     "customer": "Customer",
@@ -384,10 +387,13 @@
     "total": "Total",
     "download": "Download",
     "regenerate": "Regenerate",
+    "deleteConfirm": "Are you sure you want to delete this invoice?",
     "laborForVehicle": "Labor for vehicle {{plate}}",
     "pc": "pc",
     "dateFrom": "From",
-    "dateTo": "To"
+    "dateTo": "To",
+    "amountInWords": "Amount in words",
+    "recalculate": "Recalculate"
   },
   "auth": {
     "login": "Log In",
@@ -417,6 +423,7 @@
     "financial": {
       "revenue": "Total Revenue",
       "partsCost": "Parts Cost",
+      "partsProfit": "Parts Profit",
       "operatingExpenses": "Operating Expenses",
       "netProfit": "Net Profit",
       "margin": "Margin",

@@ -5,8 +5,10 @@ import {
   fetchInvoiceData,
   fetchExistingInvoice,
   getNextInvoiceNumber,
+  consumeNextInvoiceNumber,
   createInvoiceRecord,
   updateInvoiceRecord,
+  deleteInvoiceRecord,
   fetchInvoices,
 } from '@/features/invoices/api'
 import type { InvoiceInsert } from '@/features/invoices/types'
@@ -42,11 +44,14 @@ export function useSaveInvoice() {
       if (existingId) {
         return updateInvoiceRecord(existingId, invoice)
       }
+      // Consume (increment) the invoice number counter on first save
+      await consumeNextInvoiceNumber()
       return createInvoiceRecord(invoice)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] })
       queryClient.invalidateQueries({ queryKey: ['services'] })
+      queryClient.invalidateQueries({ queryKey: ['user'] })
       toast.success(t('common.saved'))
     },
     onError: () => {
@@ -55,9 +60,27 @@ export function useSaveInvoice() {
   })
 }
 
-export function useNextInvoiceNumber() {
+export function useNextInvoiceNumber(serviceId: string, hasExistingInvoice: boolean) {
+  return useQuery({
+    queryKey: ['invoices', 'nextNumber', serviceId],
+    queryFn: getNextInvoiceNumber,
+    enabled: !hasExistingInvoice,
+    staleTime: Infinity,
+  })
+}
+
+export function useDeleteInvoice() {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
   return useMutation({
-    mutationFn: getNextInvoiceNumber,
+    mutationFn: (id: string) => deleteInvoiceRecord(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['invoices'] })
+    },
+    onError: () => {
+      toast.error(t('common.error'))
+    },
   })
 }
 

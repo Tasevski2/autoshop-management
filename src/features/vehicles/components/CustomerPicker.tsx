@@ -128,6 +128,14 @@ export default function CustomerPicker({ value, displayName, onChange, disabled 
         onFocus={() => {
           if (search.length >= 2) setOpen(true)
         }}
+        onKeyDown={(e) => {
+          if (e.key === 'Tab' && open && options.length > 0) {
+            e.preventDefault()
+            onChange(options[0].id, options[0].full_name)
+            setSearch('')
+            setOpen(false)
+          }
+        }}
         placeholder={t('vehicles.searchCustomer')}
         disabled={disabled}
       />

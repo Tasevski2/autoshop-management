@@ -22,6 +22,7 @@ const profileSchema = z.object({
   bank_name: z.string().optional().transform((v) => v || null),
   tax_id: z.string().optional().transform((v) => v || null),
   authorized_signer: z.string().optional().transform((v) => v || null),
+  next_invoice_number: z.preprocess((v) => (v === '' || v === undefined ? 1 : Number(v)), z.number().int().min(1)),
 })
 
 type ProfileFormData = z.infer<typeof profileSchema>
@@ -36,7 +37,7 @@ export default function InvoiceSettingsPage() {
     handleSubmit,
     formState: { errors },
   } = useForm<ProfileFormData>({
-    resolver: zodResolver(profileSchema),
+    resolver: zodResolver(profileSchema) as never,
     values: profile
       ? {
           workshop_name: profile.workshop_name ?? '',
@@ -48,6 +49,7 @@ export default function InvoiceSettingsPage() {
           bank_name: profile.bank_name ?? '',
           tax_id: profile.tax_id ?? '',
           authorized_signer: profile.authorized_signer ?? '',
+          next_invoice_number: profile.next_invoice_number ?? 1,
         }
       : undefined,
   })
@@ -66,7 +68,7 @@ export default function InvoiceSettingsPage() {
         <CardTitle>{t('settings.invoiceSettings')}</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit as never)} className="space-y-6">
           {/* Workshop info */}
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
@@ -135,6 +137,23 @@ export default function InvoiceSettingsPage() {
             <div className="space-y-2 max-w-sm">
               <Label htmlFor="authorized_signer">{t('settings.invoice.authorizedSigner')}</Label>
               <Input id="authorized_signer" {...register('authorized_signer')} />
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Invoice numbering */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+              {t('settings.invoice.invoiceNumbering')}
+            </h3>
+            <div className="space-y-2 max-w-sm">
+              <Label htmlFor="next_invoice_number">{t('settings.invoice.nextInvoiceNumber')}</Label>
+              <Input id="next_invoice_number" type="number" min={1} {...register('next_invoice_number')} />
+              <p className="text-xs text-muted-foreground">{t('settings.invoice.nextInvoiceNumberHint')}</p>
+              {errors.next_invoice_number && (
+                <p className="text-sm text-destructive">{t('common.required')}</p>
+              )}
             </div>
           </div>
 

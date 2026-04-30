@@ -48,8 +48,8 @@ export default function RevenueTrendChart() {
             <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => formatMoney(v)} />
             <Tooltip
               {...tooltipStyle}
-              formatter={(value: number, name: string) => [
-                `${formatMoney(value)} ден.`,
+              formatter={(value, name) => [
+                `${formatMoney(Number(value))} ден.`,
                 name === 'avgRevenuePerDay' ? t('reports.financial.avgPerDay') : t('reports.financial.trend'),
               ]}
             />

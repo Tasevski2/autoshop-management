@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { useTranslation } from 'react-i18next'
-import { Plus, Search, ChevronLeft, ChevronRight, Pencil, Trash2, Wrench } from 'lucide-react'
+import { Plus, Search, ChevronLeft, ChevronRight, Pencil, Trash2, Wrench, Check, X as XIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -185,9 +185,17 @@ export default function ServicesListPage() {
                         {s.service_total != null ? `${s.service_total.toLocaleString()} ден` : '—'}
                       </TableCell>
                       <TableCell className="text-right">
-                        {s.balance_due != null && s.balance_due > 0
-                          ? `${s.balance_due.toLocaleString()} ден`
-                          : '—'}
+                        {s.balance_due != null && s.balance_due > 0 ? (
+                          <span className="inline-flex items-center gap-1 text-destructive font-medium">
+                            <XIcon className="h-3.5 w-3.5" />
+                            {s.balance_due.toLocaleString()} ден
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
+                            <Check className="h-3.5 w-3.5" />
+                            0 ден
+                          </span>
+                        )}
                       </TableCell>
                       <TableCell onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center gap-1">

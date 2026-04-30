@@ -277,7 +277,10 @@
       "bankName": "Банка",
       "taxId": "ЕДБ",
       "signing": "Потпис на фактура",
-      "authorizedSigner": "Лице овластено за потпис"
+      "authorizedSigner": "Лице овластено за потпис",
+      "invoiceNumbering": "Нумерирање на фактури",
+      "nextInvoiceNumber": "Следен број на фактура",
+      "nextInvoiceNumberHint": "Следната фактура ќе го користи овој број"
     }
   },
   "parts": {
@@ -376,7 +379,7 @@
     "invoiceDate": "Датум",
     "dueDate": "Валута",
     "invoiceNumber": "Фактура бр.",
-    "generatePdf": "Генерирај PDF",
+    "generatePdf": "Зачувај и генерирај PDF",
     "noInvoices": "Нема фактури",
     "date": "Датум",
     "customer": "Клиент",
@@ -384,10 +387,13 @@
     "total": "Вкупно",
     "download": "Преземи",
     "regenerate": "Регенерирај",
+    "deleteConfirm": "Дали сте сигурни дека сакате да ја избришете оваа фактура?",
     "laborForVehicle": "Работна рака за возило {{plate}}",
     "pc": "ком",
     "dateFrom": "Од",
-    "dateTo": "До"
+    "dateTo": "До",
+    "amountInWords": "Со зборови",
+    "recalculate": "Пресметај"
   },
   "auth": {
     "login": "Најава",
@@ -417,6 +423,7 @@
     "financial": {
       "revenue": "Вкупен приход",
       "partsCost": "Трошок за делови",
+      "partsProfit": "Профит од делови",
       "operatingExpenses": "Оперативни трошоци",
       "netProfit": "Нето профит",
       "margin": "Маржа",

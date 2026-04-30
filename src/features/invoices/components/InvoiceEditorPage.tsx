@@ -1,23 +1,28 @@
-import { useState, useEffect, useCallback } from 'react'
-import { useParams, useNavigate } from 'react-router'
-import { useTranslation } from 'react-i18next'
-import { ArrowLeft, FileText, Loader2 } from 'lucide-react'
-import { toLocalDateStr } from '@/lib/dates'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
-import InvoicePreview from './InvoicePreview'
-import InvoiceLineItemsEditor from './InvoiceLineItemsEditor'
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { useParams, useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
+import { ArrowLeft, FileText, Save, Loader2 } from "lucide-react";
+import { toLocalDateStr } from "@/lib/dates";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import InvoicePreview from "./InvoicePreview";
+import InvoiceLineItemsEditor from "./InvoiceLineItemsEditor";
 import {
   useInvoiceData,
   useExistingInvoice,
   useNextInvoiceNumber,
   useSaveInvoice,
-} from '@/features/invoices/hooks/useInvoices'
-import { downloadInvoicePdf } from '@/lib/invoice-pdf'
-import type { InvoiceLineItem, InvoiceSeller, InvoiceBuyer } from '@/features/invoices/types'
+} from "@/features/invoices/hooks/useInvoices";
+import { downloadInvoicePdf } from "@/lib/invoice-pdf";
+import { numberToWordsMk } from "@/lib/number-to-words-mk";
+import type {
+  InvoiceLineItem,
+  InvoiceSeller,
+  InvoiceBuyer,
+} from "@/features/invoices/types";
 
 function buildInitialItems(
   parts: { name: string; quantity: number; sell_price: number }[],
@@ -26,25 +31,25 @@ function buildInitialItems(
 ): InvoiceLineItem[] {
   const items: InvoiceLineItem[] = parts.map((p) => ({
     description: p.name,
-    unit: 'ком',
+    unit: "ком",
     quantity: p.quantity,
     priceWithoutTax: p.sell_price,
     discountPercent: 0,
     vatPercent: 0,
-  }))
+  }));
 
   if (laborCost && laborCost > 0) {
     items.push({
       description: `Работна рака за возило ${plateNumber}`,
-      unit: 'ком',
+      unit: "ком",
       quantity: 1,
       priceWithoutTax: laborCost,
       discountPercent: 0,
       vatPercent: 0,
-    })
+    });
   }
 
-  return items
+  return items;
 }
 
 function InvoiceEditorLoaded({
@@ -52,57 +57,85 @@ function InvoiceEditorLoaded({
   data,
   existingInvoice,
 }: {
-  serviceId: string
-  data: NonNullable<ReturnType<typeof useInvoiceData>['data']>
-  existingInvoice: ReturnType<typeof useExistingInvoice>['data']
+  serviceId: string;
+  data: NonNullable<ReturnType<typeof useInvoiceData>["data"]>;
+  existingInvoice: ReturnType<typeof useExistingInvoice>["data"];
 }) {
-  const { t } = useTranslation()
-  const navigate = useNavigate()
-  const nextNumberMutation = useNextInvoiceNumber()
-  const saveMutation = useSaveInvoice()
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { data: nextNumber } = useNextInvoiceNumber(
+    serviceId,
+    !!existingInvoice,
+  );
+  const saveMutation = useSaveInvoice();
 
-  const { service, parts, profile } = data
+  const { service, parts, profile } = data;
   const vehicle = service.vehicles as {
-    plate_number: string
-    brand: string
-    model: string | null
-    customer_id: string
+    plate_number: string;
+    brand: string;
+    model: string | null;
+    customer_id: string;
     customers: {
-      id: string
-      full_name: string
-      phone: string | null
-      email: string | null
-      customer_type: string
-      address: string | null
-      city: string | null
-      tax_number: string | null
-    } | null
-  } | null
-  const customer = vehicle?.customers
+      id: string;
+      full_name: string;
+      phone: string | null;
+      email: string | null;
+      customer_type: string;
+      address: string | null;
+      city: string | null;
+      tax_number: string | null;
+    } | null;
+  } | null;
+  const customer = vehicle?.customers;
 
-  const [invoiceNumber, setInvoiceNumber] = useState(() => existingInvoice?.invoice_number ?? '')
+  const [invoiceNumber, setInvoiceNumber] = useState(
+    () => existingInvoice?.invoice_number ?? "",
+  );
   const [invoiceDate, setInvoiceDate] = useState(() =>
-    service.service_date ? service.service_date.split('T')[0] : toLocalDateStr()
-  )
+    service.service_date
+      ? service.service_date.split("T")[0]
+      : toLocalDateStr(),
+  );
   const [dueDate, setDueDate] = useState(() => {
-    if (existingInvoice?.due_date) return existingInvoice.due_date
-    const d = new Date(service.service_date || Date.now())
-    d.setDate(d.getDate() + 7)
-    return d.toISOString().split('T')[0]
-  })
+    if (existingInvoice?.due_date) return existingInvoice.due_date;
+    const d = new Date(service.service_date || Date.now());
+    d.setMonth(d.getMonth() + 1);
+    return d.toISOString().split("T")[0];
+  });
   const [lineItems, setLineItems] = useState<InvoiceLineItem[]>(() =>
-    buildInitialItems(parts, service.labor_cost, vehicle?.plate_number ?? '')
-  )
+    buildInitialItems(parts, service.labor_cost, vehicle?.plate_number ?? ""),
+  );
+  const [userEditedWords, setUserEditedWords] = useState(false);
+  const computedTotal = useMemo(() => {
+    return lineItems.reduce((sum, item) => {
+      const base = item.priceWithoutTax * item.quantity;
+      const disc = base * (item.discountPercent / 100);
+      const afterDisc = base - disc;
+      return sum + afterDisc + afterDisc * (item.vatPercent / 100);
+    }, 0);
+  }, [lineItems]);
+  const [amountInWords, setAmountInWords] = useState(() =>
+    numberToWordsMk(Math.round(computedTotal)),
+  );
 
-  // Fetch next invoice number if no existing invoice (one-time)
+  // Auto-update amount in words when total changes (unless user edited manually)
   useEffect(() => {
-    if (!existingInvoice) {
-      nextNumberMutation.mutate(undefined, {
-        onSuccess: (num) => setInvoiceNumber(num),
-      })
+    if (!userEditedWords) {
+      setAmountInWords(numberToWordsMk(Math.round(computedTotal)));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [computedTotal]);
+
+  const recalculateWords = () => {
+    setAmountInWords(numberToWordsMk(Math.round(computedTotal)));
+    setUserEditedWords(false);
+  };
+
+  // Set invoice number from query only once (before first save)
+  useEffect(() => {
+    if (!existingInvoice && nextNumber && !invoiceNumber) {
+      setInvoiceNumber(nextNumber);
+    }
+  }, [nextNumber, existingInvoice, invoiceNumber]);
 
   const seller: InvoiceSeller = {
     workshopName: profile.workshop_name,
@@ -114,41 +147,58 @@ function InvoiceEditorLoaded({
     bankName: profile.bank_name,
     taxId: profile.tax_id,
     authorizedSigner: profile.authorized_signer,
-  }
+  };
 
   const buyer: InvoiceBuyer = {
-    name: customer?.full_name ?? '',
-    customerType: (customer?.customer_type as 'person' | 'company') ?? 'person',
+    name: customer?.full_name ?? "",
+    customerType: (customer?.customer_type as "person" | "company") ?? "person",
     address: customer?.address ?? null,
     city: customer?.city ?? null,
     taxNumber: customer?.tax_number ?? null,
-  }
+  };
+
+  const invoicePayload = useMemo(
+    () => ({
+      existingId: existingInvoice?.id ?? null,
+      invoice: {
+        service_id: serviceId,
+        invoice_number: invoiceNumber,
+        due_date: dueDate || null,
+        issued_at: new Date(invoiceDate + "T00:00:00").toISOString(),
+      },
+    }),
+    [existingInvoice, serviceId, invoiceNumber, dueDate, invoiceDate],
+  );
+
+  const handleSave = useCallback(() => {
+    saveMutation.mutate(invoicePayload);
+  }, [invoicePayload, saveMutation]);
 
   const handleGenerate = useCallback(() => {
-    saveMutation.mutate(
-      {
-        existingId: existingInvoice?.id ?? null,
-        invoice: {
-          service_id: serviceId,
-          invoice_number: invoiceNumber,
-          due_date: dueDate || null,
-          issued_at: new Date(invoiceDate + 'T00:00:00').toISOString(),
-        },
+    saveMutation.mutate(invoicePayload, {
+      onSuccess: () => {
+        downloadInvoicePdf({
+          invoiceNumber,
+          invoiceDate,
+          dueDate,
+          seller,
+          buyer,
+          lineItems,
+          amountInWords,
+        });
       },
-      {
-        onSuccess: () => {
-          downloadInvoicePdf({
-            invoiceNumber,
-            invoiceDate,
-            dueDate,
-            seller,
-            buyer,
-            lineItems,
-          })
-        },
-      }
-    )
-  }, [invoiceNumber, invoiceDate, dueDate, seller, buyer, lineItems, serviceId, existingInvoice, saveMutation])
+    });
+  }, [
+    invoicePayload,
+    invoiceNumber,
+    invoiceDate,
+    dueDate,
+    seller,
+    buyer,
+    lineItems,
+    amountInWords,
+    saveMutation,
+  ]);
 
   return (
     <div className="space-y-6">
@@ -156,27 +206,44 @@ function InvoiceEditorLoaded({
       <div className="flex items-center justify-between">
         <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
           <ArrowLeft className="mr-1 h-4 w-4" />
-          {t('common.back')}
+          {t("common.back")}
         </Button>
-        <Button onClick={handleGenerate} disabled={saveMutation.isPending || !invoiceNumber}>
-          {saveMutation.isPending ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <FileText className="mr-2 h-4 w-4" />
-          )}
-          {t('invoices.generatePdf')}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={handleSave}
+            disabled={saveMutation.isPending || !invoiceNumber}
+          >
+            {saveMutation.isPending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Save className="mr-2 h-4 w-4" />
+            )}
+            {t("common.save")}
+          </Button>
+          <Button
+            onClick={handleGenerate}
+            disabled={saveMutation.isPending || !invoiceNumber}
+          >
+            {saveMutation.isPending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <FileText className="mr-2 h-4 w-4" />
+            )}
+            {t("invoices.generatePdf")}
+          </Button>
+        </div>
       </div>
 
       {/* Invoice metadata */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base">{t('invoices.editor')}</CardTitle>
+          <CardTitle className="text-base">{t("invoices.editor")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div className="space-y-1">
-              <Label>{t('invoices.invoiceNumber')}</Label>
+              <Label>{t("invoices.invoiceNumber")}</Label>
               <Input
                 value={invoiceNumber}
                 onChange={(e) => setInvoiceNumber(e.target.value)}
@@ -184,7 +251,7 @@ function InvoiceEditorLoaded({
               />
             </div>
             <div className="space-y-1">
-              <Label>{t('invoices.invoiceDate')}</Label>
+              <Label>{t("invoices.invoiceDate")}</Label>
               <Input
                 type="date"
                 value={invoiceDate}
@@ -192,12 +259,35 @@ function InvoiceEditorLoaded({
               />
             </div>
             <div className="space-y-1">
-              <Label>{t('invoices.dueDate')}</Label>
+              <Label>{t("invoices.dueDate")}</Label>
               <Input
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
               />
+            </div>
+          </div>
+          <div className="space-y-1 mt-4">
+            <Label>{t("invoices.amountInWords")}</Label>
+            <div className="flex gap-2">
+              <Input
+                value={amountInWords}
+                onChange={(e) => {
+                  setUserEditedWords(true);
+                  setAmountInWords(e.target.value);
+                }}
+                className="flex-1"
+              />
+              {userEditedWords && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={recalculateWords}
+                >
+                  {t("invoices.recalculate")}
+                </Button>
+              )}
             </div>
           </div>
         </CardContent>
@@ -206,7 +296,7 @@ function InvoiceEditorLoaded({
       {/* Line items editor */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base">{t('invoices.lineItems')}</CardTitle>
+          <CardTitle className="text-base">{t("invoices.lineItems")}</CardTitle>
         </CardHeader>
         <CardContent>
           <InvoiceLineItemsEditor items={lineItems} onChange={setLineItems} />
@@ -217,7 +307,7 @@ function InvoiceEditorLoaded({
 
       {/* Live preview */}
       <div>
-        <h3 className="text-lg font-semibold mb-3">{t('invoices.preview')}</h3>
+        <h3 className="text-lg font-semibold mb-3">{t("invoices.preview")}</h3>
         <div className="overflow-x-auto">
           <InvoicePreview
             invoiceNumber={invoiceNumber}
@@ -226,22 +316,24 @@ function InvoiceEditorLoaded({
             seller={seller}
             buyer={buyer}
             lineItems={lineItems}
+            amountInWords={amountInWords}
           />
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default function InvoiceEditorPage() {
-  const { t } = useTranslation()
-  const { id: serviceId } = useParams<{ id: string }>()
+  const { t } = useTranslation();
+  const { id: serviceId } = useParams<{ id: string }>();
 
-  const { data, isLoading } = useInvoiceData(serviceId!)
-  const { data: existingInvoice, isLoading: loadingInvoice } = useExistingInvoice(serviceId!)
+  const { data, isLoading } = useInvoiceData(serviceId!);
+  const { data: existingInvoice, isLoading: loadingInvoice } =
+    useExistingInvoice(serviceId!);
 
   if (isLoading || loadingInvoice || !data) {
-    return <p className="text-muted-foreground">{t('common.loading')}</p>
+    return <p className="text-muted-foreground">{t("common.loading")}</p>;
   }
 
   return (
@@ -250,5 +342,5 @@ export default function InvoiceEditorPage() {
       data={data}
       existingInvoice={existingInvoice ?? null}
     />
-  )
+  );
 }
