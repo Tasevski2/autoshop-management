@@ -123,14 +123,14 @@ export default function ExpensesListPage() {
             type="date"
             value={dateFrom}
             onChange={(e) => { setDateFrom(e.target.value); setPage(0) }}
-            className="w-36"
+            className="w-34"
           />
           <span className="text-muted-foreground text-sm">–</span>
           <Input
             type="date"
             value={dateTo}
             onChange={(e) => { setDateTo(e.target.value); setPage(0) }}
-            className="w-36"
+            className="w-34"
           />
         </div>
       </div>
@@ -141,7 +141,7 @@ export default function ExpensesListPage() {
         <p className="text-muted-foreground">{t('expenses.noExpenses')}</p>
       ) : (
         <>
-          <div className="rounded-md border">
+          <div className="rounded-md border overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>

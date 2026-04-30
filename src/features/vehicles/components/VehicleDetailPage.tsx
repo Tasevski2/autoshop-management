@@ -265,7 +265,7 @@ export default function VehicleDetailPage() {
           <p className="text-sm text-muted-foreground">{t('vehicles.noServices')}</p>
         ) : (
           <>
-            <div className="rounded-md border">
+            <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>

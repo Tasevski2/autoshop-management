@@ -68,8 +68,7 @@ function DialogContent({
               />
             }
           >
-            <XIcon
-            />
+            <XIcon className="text-destructive" />
             <span className="sr-only">Close</span>
           </DialogPrimitive.Close>
         )}

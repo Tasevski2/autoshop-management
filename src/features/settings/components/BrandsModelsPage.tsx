@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Plus, Trash2, Globe } from 'lucide-react'
+import { Plus, Trash2, Globe, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -26,8 +26,11 @@ export default function BrandsModelsPage() {
   const [selectedBrandId, setSelectedBrandId] = useState<string | null>(null)
   const [newBrandName, setNewBrandName] = useState('')
   const [newModelName, setNewModelName] = useState('')
+  const [brandSearch, setBrandSearch] = useState('')
+  const [modelSearch, setModelSearch] = useState('')
   const [deleteBrandTarget, setDeleteBrandTarget] = useState<string | null>(null)
   const [deleteModelTarget, setDeleteModelTarget] = useState<string | null>(null)
+  const modelsRef = useRef<HTMLDivElement>(null)
 
   const { data: brands = [], isLoading: loadingBrands } = useBrands()
   const { data: models = [], isLoading: loadingModels } = useModels(selectedBrandId)
@@ -38,6 +41,23 @@ export default function BrandsModelsPage() {
   const deleteModelMutation = useDeleteModel(selectedBrandId)
 
   const selectedBrand = brands.find((b) => b.id === selectedBrandId)
+
+  const filteredBrands = brandSearch
+    ? brands.filter((b) => b.name.toLowerCase().includes(brandSearch.toLowerCase()))
+    : brands
+
+  const filteredModels = modelSearch
+    ? models.filter((m) => m.name.toLowerCase().includes(modelSearch.toLowerCase()))
+    : models
+
+  const handleSelectBrand = (brandId: string) => {
+    setSelectedBrandId(brandId)
+    setModelSearch('')
+    // On mobile, scroll to models panel
+    setTimeout(() => {
+      modelsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 100)
+  }
 
   const handleAddBrand = async () => {
     const name = newBrandName.trim()
@@ -114,14 +134,29 @@ export default function BrandsModelsPage() {
             </Button>
           </form>
 
+          {/* Brand search */}
+          {brands.length > 5 && (
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={brandSearch}
+                onChange={(e) => setBrandSearch(e.target.value)}
+                placeholder={t('common.search')}
+                className="pl-10"
+              />
+            </div>
+          )}
+
           {/* Brand list */}
           {loadingBrands ? (
             <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
           ) : brands.length === 0 ? (
             <p className="text-sm text-muted-foreground">{t('brands.noBrands')}</p>
+          ) : filteredBrands.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{t('common.noResults')}</p>
           ) : (
-            <div className="space-y-1">
-              {brands.map((brand) => {
+            <div className="space-y-1 max-h-80 overflow-y-auto">
+              {filteredBrands.map((brand) => {
                 const isGlobal = !brand.user_id
                 return (
                   <div
@@ -131,7 +166,7 @@ export default function BrandsModelsPage() {
                         ? 'bg-accent text-accent-foreground'
                         : 'hover:bg-muted'
                     }`}
-                    onClick={() => setSelectedBrandId(brand.id)}
+                    onClick={() => handleSelectBrand(brand.id)}
                   >
                     <span className="flex items-center gap-2 font-medium">
                       {isGlobal && <Globe className="h-3.5 w-3.5 text-muted-foreground" />}
@@ -158,7 +193,7 @@ export default function BrandsModelsPage() {
       </Card>
 
       {/* Models panel */}
-      <Card>
+      <Card ref={modelsRef}>
         <CardHeader>
           <CardTitle>
             {selectedBrand
@@ -192,14 +227,29 @@ export default function BrandsModelsPage() {
                 </Button>
               </form>
 
+              {/* Model search */}
+              {models.length > 5 && (
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    value={modelSearch}
+                    onChange={(e) => setModelSearch(e.target.value)}
+                    placeholder={t('common.search')}
+                    className="pl-10"
+                  />
+                </div>
+              )}
+
               {/* Model list */}
               {loadingModels ? (
                 <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
               ) : models.length === 0 ? (
                 <p className="text-sm text-muted-foreground">{t('brands.noModels')}</p>
+              ) : filteredModels.length === 0 ? (
+                <p className="text-sm text-muted-foreground">{t('common.noResults')}</p>
               ) : (
-                <div className="space-y-1">
-                  {models.map((model) => {
+                <div className="space-y-1 max-h-80 overflow-y-auto">
+                  {filteredModels.map((model) => {
                     const isGlobalModel = !model.user_id
                     return (
                       <div

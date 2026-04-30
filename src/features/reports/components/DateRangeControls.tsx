@@ -1,19 +1,25 @@
-import { useTranslation } from 'react-i18next'
-import { Calendar } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import type { DatePreset } from '../types'
-import { daysBetween, formatDate } from '../utils'
+import { useTranslation } from "react-i18next";
+import { Calendar } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import type { DatePreset } from "../types";
+import { daysBetween, formatDate } from "../utils";
 
 interface Props {
-  dateFrom: string
-  dateTo: string
-  activePreset: DatePreset | null
-  onPresetChange: (preset: DatePreset) => void
-  onCustomRange: (from: string, to: string) => void
+  dateFrom: string;
+  dateTo: string;
+  activePreset: DatePreset | null;
+  onPresetChange: (preset: DatePreset) => void;
+  onCustomRange: (from: string, to: string) => void;
 }
 
-const presets: DatePreset[] = ['today', 'thisWeek', 'thisMonth', 'thisYear', 'allTime']
+const presets: DatePreset[] = [
+  "today",
+  "thisWeek",
+  "thisMonth",
+  "thisYear",
+  "allTime",
+];
 
 export default function DateRangeControls({
   dateFrom,
@@ -22,17 +28,17 @@ export default function DateRangeControls({
   onPresetChange,
   onCustomRange,
 }: Props) {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
-  const days = daysBetween(dateFrom, dateTo)
+  const days = daysBetween(dateFrom, dateTo);
 
   const presetLabels: Record<DatePreset, string> = {
-    today: t('reports.dateRange.today'),
-    thisWeek: t('reports.dateRange.thisWeek'),
-    thisMonth: t('reports.dateRange.thisMonth'),
-    thisYear: t('reports.dateRange.thisYear'),
-    allTime: t('reports.dateRange.allTime'),
-  }
+    today: t("reports.dateRange.today"),
+    thisWeek: t("reports.dateRange.thisWeek"),
+    thisMonth: t("reports.dateRange.thisMonth"),
+    thisYear: t("reports.dateRange.thisYear"),
+    allTime: t("reports.dateRange.allTime"),
+  };
 
   return (
     <div className="space-y-2">
@@ -42,7 +48,7 @@ export default function DateRangeControls({
           {presets.map((p) => (
             <Button
               key={p}
-              variant={activePreset === p ? 'default' : 'outline'}
+              variant={activePreset === p ? "default" : "outline"}
               size="sm"
               onClick={() => onPresetChange(p)}
             >
@@ -52,7 +58,7 @@ export default function DateRangeControls({
         </div>
 
         {/* Custom range */}
-        <div className="flex items-center gap-1.5 ml-auto">
+        <div className="flex items-center gap-1.5 sm:ml-auto">
           <Calendar className="h-4 w-4 text-muted-foreground" />
           <Input
             type="date"
@@ -72,8 +78,9 @@ export default function DateRangeControls({
 
       {/* Period label */}
       <p className="text-sm text-muted-foreground">
-        {formatDate(dateFrom)} — {formatDate(dateTo)} ({days} {t('reports.dateRange.days')})
+        {formatDate(dateFrom)} — {formatDate(dateTo)} ({days}{" "}
+        {t("reports.dateRange.days")})
       </p>
     </div>
-  )
+  );
 }

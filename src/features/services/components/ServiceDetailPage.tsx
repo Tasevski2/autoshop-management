@@ -152,12 +152,51 @@ export default function ServiceDetailPage() {
   return (
     <div className="space-y-6">
       {/* Back + Edit row */}
-      <div className="flex items-center justify-between">
-        <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-          <ArrowLeft className="mr-1 h-4 w-4" />
-          {t('common.back')}
-        </Button>
-        <div className="flex items-center gap-2">
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+            <ArrowLeft className="mr-1 h-4 w-4" />
+            {t('common.back')}
+          </Button>
+          {/* Desktop actions */}
+          <div className="hidden sm:flex items-center gap-2">
+            <select
+              value={service.status}
+              onChange={(e) => statusMutation.mutate(e.target.value as ServiceStatus)}
+              disabled={statusMutation.isPending}
+              className="flex h-8 rounded-lg border border-input bg-background px-3 text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              {STATUSES.map((s) => (
+                <option key={s} value={s}>
+                  {t(`services.statuses.${s}`)}
+                </option>
+              ))}
+            </select>
+            <Button variant="outline" size="sm" render={<Link to={`/services/${id}/invoice`} />}>
+              <FileText className="mr-2 h-3.5 w-3.5" />
+              {t('services.generateInvoice')}
+            </Button>
+            <Button variant="outline" size="sm" render={<Link to={`/services/${id}/edit`} />}>
+              <Pencil className="mr-2 h-3.5 w-3.5" />
+              {t('common.edit')}
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setDeleteServiceOpen(true)}>
+              <Trash2 className="mr-2 h-3.5 w-3.5 text-destructive" />
+              {t('common.delete')}
+            </Button>
+          </div>
+          {/* Mobile: edit + delete icons on same row as back */}
+          <div className="flex sm:hidden items-center gap-1">
+            <Button variant="outline" size="icon-sm" render={<Link to={`/services/${id}/edit`} />}>
+              <Pencil className="h-3.5 w-3.5" />
+            </Button>
+            <Button variant="outline" size="icon-sm" onClick={() => setDeleteServiceOpen(true)}>
+              <Trash2 className="h-3.5 w-3.5 text-destructive" />
+            </Button>
+          </div>
+        </div>
+        {/* Mobile: status + generate invoice on second row */}
+        <div className="flex sm:hidden items-center justify-end gap-2">
           <select
             value={service.status}
             onChange={(e) => statusMutation.mutate(e.target.value as ServiceStatus)}
@@ -173,14 +212,6 @@ export default function ServiceDetailPage() {
           <Button variant="outline" size="sm" render={<Link to={`/services/${id}/invoice`} />}>
             <FileText className="mr-2 h-3.5 w-3.5" />
             {t('services.generateInvoice')}
-          </Button>
-          <Button variant="outline" size="sm" render={<Link to={`/services/${id}/edit`} />}>
-            <Pencil className="mr-2 h-3.5 w-3.5" />
-            {t('common.edit')}
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => setDeleteServiceOpen(true)}>
-            <Trash2 className="mr-2 h-3.5 w-3.5 text-destructive" />
-            {t('common.delete')}
           </Button>
         </div>
       </div>
@@ -286,7 +317,7 @@ export default function ServiceDetailPage() {
         {parts.length === 0 ? (
           <p className="text-sm text-muted-foreground">{t('services.noParts')}</p>
         ) : (
-          <div className="rounded-md border">
+          <div className="rounded-md border overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>

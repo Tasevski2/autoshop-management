@@ -148,7 +148,7 @@ export default function VehicleFormPage() {
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>{t('vehicles.brand')} *</Label>
                 <Controller
@@ -186,7 +186,7 @@ export default function VehicleFormPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="engine_capacity">{t('vehicles.engineCapacity')}</Label>
                 <Input id="engine_capacity" type="number" step="0.1" {...register('engine_capacity')} />
@@ -197,7 +197,7 @@ export default function VehicleFormPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="year">{t('vehicles.year')}</Label>
                 <Input id="year" type="number" {...register('year')} />

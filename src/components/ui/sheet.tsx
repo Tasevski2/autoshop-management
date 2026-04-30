@@ -70,8 +70,7 @@ function SheetContent({
               />
             }
           >
-            <XIcon
-            />
+            <XIcon className="text-destructive" />
             <span className="sr-only">Close</span>
           </SheetPrimitive.Close>
         )}

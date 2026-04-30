@@ -325,6 +325,51 @@ export async function fetchVehicleOptions(search: string) {
   return data
 }
 
+export async function upsertCatalogParts(
+  parts: { name: string; buy_price?: number; sell_price?: number; catalog_part_id?: string | null }[]
+) {
+  const newParts = parts.filter((p) => !p.catalog_part_id && p.name.trim())
+  if (newParts.length === 0) return
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+
+  const names = newParts.map((p) => p.name.trim())
+  const { data: existing } = await supabase
+    .from('parts_catalog')
+    .select('id, name, buy_price, sell_price')
+    .in('name', names)
+
+  const existingMap = new Map((existing ?? []).map((e) => [e.name, e]))
+
+  const toInsert = newParts
+    .filter((p) => !existingMap.has(p.name.trim()))
+    .map((p) => ({
+      name: p.name.trim(),
+      buy_price: p.buy_price ?? 0,
+      sell_price: p.sell_price ?? 0,
+      user_id: user.id,
+    }))
+
+  const toUpdate = newParts
+    .filter((p) => {
+      const ex = existingMap.get(p.name.trim())
+      if (!ex) return false
+      return ex.buy_price !== (p.buy_price ?? 0) || ex.sell_price !== (p.sell_price ?? 0)
+    })
+    .map((p) => {
+      const ex = existingMap.get(p.name.trim())!
+      return { id: ex.id, buy_price: p.buy_price ?? 0, sell_price: p.sell_price ?? 0 }
+    })
+
+  await Promise.all([
+    toInsert.length > 0 ? supabase.from('parts_catalog').insert(toInsert) : null,
+    ...toUpdate.map((u) =>
+      supabase.from('parts_catalog').update({ buy_price: u.buy_price, sell_price: u.sell_price }).eq('id', u.id)
+    ),
+  ])
+}
+
 export async function fetchPartOptions(search: string) {
   let query = supabase
     .from('parts_catalog')

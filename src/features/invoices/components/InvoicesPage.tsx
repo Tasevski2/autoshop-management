@@ -50,14 +50,14 @@ export default function InvoicesPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex items-end gap-4">
+      <div className="flex flex-wrap items-end gap-3">
         <div className="space-y-1">
           <Label>{t('invoices.dateFrom')}</Label>
           <Input
             type="date"
             value={dateFrom}
             onChange={(e) => { setDateFrom(e.target.value); setPage(0) }}
-            className="w-40"
+            className="w-34"
           />
         </div>
         <div className="space-y-1">
@@ -66,7 +66,7 @@ export default function InvoicesPage() {
             type="date"
             value={dateTo}
             onChange={(e) => { setDateTo(e.target.value); setPage(0) }}
-            className="w-40"
+            className="w-34"
           />
         </div>
       </div>
@@ -78,7 +78,7 @@ export default function InvoicesPage() {
         <p className="text-muted-foreground">{t('invoices.noInvoices')}</p>
       ) : (
         <>
-          <div className="rounded-md border">
+          <div className="rounded-md border overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>

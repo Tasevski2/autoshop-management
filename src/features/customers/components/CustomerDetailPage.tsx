@@ -246,7 +246,7 @@ export default function CustomerDetailPage() {
           <p className="text-sm text-muted-foreground">{t('customers.noServices')}</p>
         ) : (
           <>
-            <div className="rounded-md border">
+            <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>

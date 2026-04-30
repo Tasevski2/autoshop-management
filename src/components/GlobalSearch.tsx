@@ -46,7 +46,9 @@ export default function GlobalSearch() {
     const updatePos = () => {
       if (!inputRef.current) return
       const rect = inputRef.current.getBoundingClientRect()
-      setDropdownPos({ top: rect.bottom + 4, left: rect.left, width: Math.max(rect.width, 320) })
+      const maxWidth = Math.min(window.innerWidth - 16, Math.max(rect.width, 320))
+      const left = Math.min(rect.left, window.innerWidth - maxWidth - 8)
+      setDropdownPos({ top: rect.bottom + 4, left, width: maxWidth })
     }
     updatePos()
     window.addEventListener('scroll', updatePos, true)

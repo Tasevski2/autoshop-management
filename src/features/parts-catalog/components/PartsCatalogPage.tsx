@@ -142,7 +142,7 @@ export default function PartsCatalogPage() {
           value={search}
           onChange={(e) => handleSearchChange(e.target.value)}
           placeholder={t('parts.search')}
-          className="w-64"
+          className="w-full sm:w-64"
         />
         <div className="ml-auto">
           <Button size="sm" onClick={openAddDialog}>
@@ -158,7 +158,7 @@ export default function PartsCatalogPage() {
         <p className="text-muted-foreground">{t('parts.noParts')}</p>
       ) : (
         <>
-          <div className="rounded-md border">
+          <div className="rounded-md border overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -284,7 +284,7 @@ export default function PartsCatalogPage() {
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>{t('parts.buyPrice')}</Label>
                 <Input

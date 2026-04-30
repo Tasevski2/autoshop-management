@@ -48,7 +48,7 @@ export default function StatCards() {
   ]
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
       {cards.map((card) => (
         <Link key={card.label} to={card.to}>
           <Card size="sm" className="transition-colors hover:bg-accent/50">

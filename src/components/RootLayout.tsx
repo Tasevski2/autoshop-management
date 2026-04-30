@@ -143,7 +143,7 @@ export default function RootLayout() {
       </aside>
 
       {/* Mobile header + sheet */}
-      <div className="flex flex-1 flex-col md:hidden">
+      <div className="flex min-w-0 flex-1 flex-col md:hidden">
         <header className="flex items-center gap-3 border-b bg-sidebar px-4 py-3">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger
@@ -170,16 +170,16 @@ export default function RootLayout() {
         </header>
         <div className="flex flex-1 flex-col overflow-hidden">
           <TopBar />
-          <main className="flex-1 overflow-auto bg-background p-4">
+          <main className="flex-1 overflow-y-auto overflow-x-hidden bg-background p-4">
             <Outlet />
           </main>
         </div>
       </div>
 
       {/* Desktop main */}
-      <div className="hidden md:flex flex-1 flex-col overflow-hidden">
+      <div className="hidden md:flex min-w-0 flex-1 flex-col overflow-hidden">
         <TopBar />
-        <main className="flex-1 overflow-auto bg-background p-6">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden bg-background p-6">
           <Outlet />
         </main>
       </div>

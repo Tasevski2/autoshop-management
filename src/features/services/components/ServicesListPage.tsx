@@ -102,7 +102,7 @@ export default function ServicesListPage() {
 
       {/* Filters row */}
       <div className="flex flex-wrap items-end gap-3">
-        <div className="relative max-w-sm flex-1">
+        <div className="relative w-full md:max-w-sm md:flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={search}
@@ -128,14 +128,14 @@ export default function ServicesListPage() {
             type="date"
             value={dateFrom}
             onChange={(e) => { setDateFrom(e.target.value); setPage(0) }}
-            className="w-36"
+            className="w-34"
           />
           <span className="text-muted-foreground text-sm">–</span>
           <Input
             type="date"
             value={dateTo}
             onChange={(e) => { setDateTo(e.target.value); setPage(0) }}
-            className="w-36"
+            className="w-34"
           />
         </div>
       </div>
@@ -146,7 +146,7 @@ export default function ServicesListPage() {
         <p className="text-muted-foreground">{t('common.noResults')}</p>
       ) : (
         <>
-          <div className="rounded-md border">
+          <div className="rounded-md border overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>

@@ -213,13 +213,15 @@ function InvoiceEditorLoaded({
             variant="outline"
             onClick={handleSave}
             disabled={saveMutation.isPending || !invoiceNumber}
+            size="icon"
+            className="sm:h-9 sm:w-auto sm:px-4"
           >
             {saveMutation.isPending ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin sm:mr-2" />
             ) : (
-              <Save className="mr-2 h-4 w-4" />
+              <Save className="h-4 w-4 sm:mr-2" />
             )}
-            {t("common.save")}
+            <span className="hidden sm:inline">{t("common.save")}</span>
           </Button>
           <Button
             onClick={handleGenerate}

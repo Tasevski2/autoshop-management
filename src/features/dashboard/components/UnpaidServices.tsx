@@ -2,7 +2,6 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { CircleDollarSign, ChevronRight } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { useUnpaidServices } from '../hooks/useDashboard'
 
 export default function UnpaidServices() {
@@ -30,7 +29,7 @@ export default function UnpaidServices() {
           </p>
         ) : (
           services.map((s) => (
-            <div key={s.id} className="rounded-lg border p-3 space-y-1">
+            <Link key={s.id} to={`/services/${s.id}`} className="block rounded-lg border p-3 space-y-1 transition-colors hover:bg-muted/50">
               <div className="flex items-center justify-between gap-2">
                 <div className="min-w-0">
                   <p className="text-sm font-medium truncate">
@@ -40,9 +39,7 @@ export default function UnpaidServices() {
                     {s.vehicle?.plate_number} — {s.service_date}
                   </p>
                 </div>
-                <Button variant="ghost" size="icon-xs" render={<Link to={`/services/${s.id}`} />}>
-                    <ChevronRight className="h-4 w-4" />
-                </Button>
+                <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
               </div>
               <div className="flex items-center gap-2 text-xs">
                 <span className="text-muted-foreground">
@@ -52,7 +49,7 @@ export default function UnpaidServices() {
                   {t('dashboard.owes')} {s.balance_due.toLocaleString()} {t('dashboard.currency')}
                 </span>
               </div>
-            </div>
+            </Link>
           ))
         )}
       </CardContent>

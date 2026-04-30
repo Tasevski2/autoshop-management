@@ -18,6 +18,7 @@ import {
   deletePayment,
   fetchVehicleOptions,
   fetchPartOptions,
+  upsertCatalogParts,
 } from '@/features/services/api'
 import type { ServiceInsert, ServiceUpdate, ServicePartInsert, ServiceStatus, PaymentInsert } from '@/features/services/types'
 
@@ -91,14 +92,17 @@ export function useCreateService() {
           parts.map((p) => ({ ...p, service_id: created.id }))
         )
       }
-      return created
+      return { created, parts }
     },
-    onSuccess: (service) => {
+    onSuccess: ({ created, parts }) => {
       queryClient.invalidateQueries({ queryKey: ['services'] })
       queryClient.invalidateQueries({ queryKey: ['dashboard', 'in-progress'] })
       queryClient.invalidateQueries({ queryKey: ['dashboard', 'stats'] })
       queryClient.invalidateQueries({ queryKey: ['reports'] })
-      navigate(`/services/${service.id}`)
+      upsertCatalogParts(parts).then(() => {
+        queryClient.invalidateQueries({ queryKey: ['parts'] })
+      })
+      navigate(`/services/${created.id}`)
     },
   })
 }
@@ -119,9 +123,9 @@ export function useUpdateService(id: string) {
         updateService(id, service),
         replaceServiceParts(id, parts),
       ])
-      return updated
+      return { updated, parts }
     },
-    onSuccess: () => {
+    onSuccess: ({ parts }) => {
       queryClient.invalidateQueries({ queryKey: ['services'] })
       queryClient.invalidateQueries({ queryKey: ['service-parts', 'by-service', id] })
       queryClient.invalidateQueries({ queryKey: ['service-totals', id] })
@@ -130,6 +134,9 @@ export function useUpdateService(id: string) {
       queryClient.invalidateQueries({ queryKey: ['dashboard', 'stats'] })
       queryClient.invalidateQueries({ queryKey: ['dashboard', 'unpaid'] })
       queryClient.invalidateQueries({ queryKey: ['reports'] })
+      upsertCatalogParts(parts).then(() => {
+        queryClient.invalidateQueries({ queryKey: ['parts'] })
+      })
       navigate(`/services/${id}`)
     },
   })
