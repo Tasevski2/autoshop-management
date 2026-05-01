@@ -86,8 +86,8 @@ export default function PartsCatalogPage() {
     setForm({
       name: part.name,
       description: part.description ?? '',
-      buy_price: String(part.buy_price),
-      sell_price: String(part.sell_price),
+      buy_price: part.buy_price ? String(part.buy_price) : '',
+      sell_price: part.sell_price ? String(part.sell_price) : '',
     })
     setDialogOpen(true)
   }
