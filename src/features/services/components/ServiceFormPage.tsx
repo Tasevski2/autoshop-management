@@ -72,7 +72,14 @@ export default function ServiceFormPage() {
     formState: { errors, isSubmitting },
   } = useForm<ServiceFormData>({
     resolver: zodResolver(serviceSchema) as never,
-    values: (isEdit && service
+    defaultValues: {
+      service_date: toLocalDateStr(),
+      labor_cost: 0,
+      status: 'in_progress' as const,
+      vehicle_id: presetVehicleId ?? '',
+      parts: [{ name: '', buy_price: 0, sell_price: 0, quantity: 1, catalog_part_id: null }],
+    },
+    values: (isEdit && service && existingParts
       ? {
           service_date: service.service_date,
           mileage_at_service: service.mileage_at_service ?? undefined,
@@ -81,23 +88,17 @@ export default function ServiceFormPage() {
           status: service.status,
           vehicle_id: service.vehicle_id,
           parts: [
-            ...(existingParts?.map((p) => ({
+            ...existingParts.map((p) => ({
               name: p.name,
               buy_price: p.buy_price,
               sell_price: p.sell_price,
               quantity: p.quantity,
               catalog_part_id: p.catalog_part_id,
-            })) ?? []),
+            })),
             { name: '', buy_price: 0, sell_price: 0, quantity: 1, catalog_part_id: null },
           ],
         }
-      : {
-          service_date: toLocalDateStr(),
-          labor_cost: 0,
-          status: 'in_progress',
-          vehicle_id: presetVehicleId ?? '',
-          parts: [{ name: '', buy_price: 0, sell_price: 0, quantity: 1, catalog_part_id: null }],
-        }) as ServiceFormData,
+      : undefined) as ServiceFormData | undefined,
   })
 
   const { fields, append, remove } = useFieldArray({
@@ -405,15 +406,28 @@ export default function ServiceFormPage() {
                       <div className="grid grid-cols-3 gap-2">
                         <div className="space-y-1">
                           <Label className="text-xs text-muted-foreground">{t('services.buyPrice')}</Label>
-                          <Input type="number" {...register(`parts.${index}.buy_price`)} />
+                          <Input
+                            type="number"
+                            value={currentPart?.buy_price ?? 0}
+                            onChange={(e) => setValue(`parts.${index}.buy_price`, e.target.value === '' ? 0 : Number(e.target.value))}
+                          />
                         </div>
                         <div className="space-y-1">
                           <Label className="text-xs text-muted-foreground">{t('services.sellPrice')}</Label>
-                          <Input type="number" {...register(`parts.${index}.sell_price`)} />
+                          <Input
+                            type="number"
+                            value={currentPart?.sell_price ?? 0}
+                            onChange={(e) => setValue(`parts.${index}.sell_price`, e.target.value === '' ? 0 : Number(e.target.value))}
+                          />
                         </div>
                         <div className="space-y-1">
                           <Label className="text-xs text-muted-foreground">{t('services.quantity')}</Label>
-                          <Input type="number" min={1} {...register(`parts.${index}.quantity`)} />
+                          <Input
+                            type="number"
+                            min={1}
+                            value={currentPart?.quantity ?? 1}
+                            onChange={(e) => setValue(`parts.${index}.quantity`, e.target.value === '' ? 1 : Number(e.target.value))}
+                          />
                         </div>
                       </div>
                       <div className="flex justify-end text-sm font-medium">
