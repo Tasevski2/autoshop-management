@@ -42,7 +42,7 @@ export default function CustomerFormPage() {
     handleSubmit,
     watch,
     setValue,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<CustomerFormData>({
     resolver: zodResolver(customerSchema) as never,
     values: isEdit && customer
@@ -171,7 +171,7 @@ export default function CustomerFormPage() {
             </div>
 
             <div className="flex gap-2">
-              <Button type="submit" disabled={isSubmitting}>
+              <Button type="submit" loading={createMutation.isPending || updateMutation.isPending}>
                 {t('common.save')}
               </Button>
               <Button variant="outline" type="button" onClick={() => navigate(-1)}>

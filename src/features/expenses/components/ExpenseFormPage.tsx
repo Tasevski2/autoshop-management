@@ -147,7 +147,7 @@ function ExpenseForm({
             </div>
 
             <div className="flex gap-2">
-              <Button type="submit" disabled={!expenseDate || !amount || isPending}>
+              <Button type="submit" disabled={!expenseDate || !amount} loading={isPending}>
                 {t('common.save')}
               </Button>
               <Button variant="outline" type="button" onClick={() => navigate(-1)}>

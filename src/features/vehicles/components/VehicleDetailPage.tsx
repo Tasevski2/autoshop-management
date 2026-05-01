@@ -464,7 +464,7 @@ export default function VehicleDetailPage() {
                             data: { is_active: false },
                           })
                         }
-                        disabled={updateReminderMutation.isPending}
+                        loading={updateReminderMutation.isPending}
                         title={t('reminders.deactivate')}
                       >
                         <X className="h-3.5 w-3.5" />
@@ -529,7 +529,7 @@ export default function VehicleDetailPage() {
             <Button
               variant="destructive"
               onClick={() => deleteVehicleMutation.mutate(id!)}
-              disabled={deleteVehicleMutation.isPending}
+              loading={deleteVehicleMutation.isPending}
             >
               {t('common.delete')}
             </Button>

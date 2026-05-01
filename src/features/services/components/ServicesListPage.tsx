@@ -263,7 +263,7 @@ export default function ServicesListPage() {
             <Button variant="outline" onClick={() => setDeleteTarget(null)}>
               {t('common.cancel')}
             </Button>
-            <Button variant="destructive" onClick={confirmDelete} disabled={deleteMutation.isPending}>
+            <Button variant="destructive" onClick={confirmDelete} loading={deleteMutation.isPending}>
               {t('common.delete')}
             </Button>
           </DialogFooter>

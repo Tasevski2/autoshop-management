@@ -421,7 +421,7 @@ export default function ServiceDetailPage() {
                 </div>
               </div>
               <div className="flex gap-2 mt-3">
-                <Button size="sm" onClick={handleAddPayment} disabled={createPaymentMutation.isPending}>
+                <Button size="sm" onClick={handleAddPayment} loading={createPaymentMutation.isPending}>
                   <Check className="mr-1 h-3.5 w-3.5" />
                   {t('common.save')}
                 </Button>
@@ -492,7 +492,7 @@ export default function ServiceDetailPage() {
             size="sm"
             variant="outline"
             onClick={() => fileInputRef.current?.click()}
-            disabled={uploadMutation.isPending}
+            loading={uploadMutation.isPending}
           >
             <Upload className="mr-1 h-3.5 w-3.5" />
             {t('services.uploadPhoto')}
@@ -546,7 +546,7 @@ export default function ServiceDetailPage() {
             <Button variant="outline" onClick={() => setDeleteTarget(null)}>
               {t('common.cancel')}
             </Button>
-            <Button variant="destructive" onClick={confirmDeleteImage} disabled={deleteMutation.isPending}>
+            <Button variant="destructive" onClick={confirmDeleteImage} loading={deleteMutation.isPending}>
               {t('common.delete')}
             </Button>
           </DialogFooter>
@@ -564,7 +564,7 @@ export default function ServiceDetailPage() {
             <Button variant="outline" onClick={() => setDeletePaymentTarget(null)}>
               {t('common.cancel')}
             </Button>
-            <Button variant="destructive" onClick={confirmDeletePayment} disabled={deletePaymentMutation.isPending}>
+            <Button variant="destructive" onClick={confirmDeletePayment} loading={deletePaymentMutation.isPending}>
               {t('common.delete')}
             </Button>
           </DialogFooter>
@@ -585,7 +585,7 @@ export default function ServiceDetailPage() {
             <Button
               variant="destructive"
               onClick={() => deleteServiceMutation.mutate(id!)}
-              disabled={deleteServiceMutation.isPending}
+              loading={deleteServiceMutation.isPending}
             >
               {t('common.delete')}
             </Button>

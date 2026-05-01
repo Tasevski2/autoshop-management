@@ -118,7 +118,8 @@ export default function PaymentFormPage() {
             <div className="flex gap-2">
               <Button
                 type="submit"
-                disabled={!serviceId || !amount || parseFloat(amount) <= 0 || createMutation.isPending}
+                disabled={!serviceId || !amount || parseFloat(amount) <= 0}
+                loading={createMutation.isPending}
               >
                 {t('common.save')}
               </Button>

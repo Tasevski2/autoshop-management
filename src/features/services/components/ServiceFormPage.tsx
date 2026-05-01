@@ -69,7 +69,7 @@ export default function ServiceFormPage() {
     handleSubmit,
     control,
     setValue,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<ServiceFormData>({
     resolver: zodResolver(serviceSchema) as never,
     defaultValues: {
@@ -469,7 +469,7 @@ export default function ServiceFormPage() {
 
         {/* Actions */}
         <div className="flex gap-2">
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" loading={createMutation.isPending || updateMutation.isPending}>
             {t('common.save')}
           </Button>
           <Button variant="outline" type="button" onClick={() => navigate(-1)}>

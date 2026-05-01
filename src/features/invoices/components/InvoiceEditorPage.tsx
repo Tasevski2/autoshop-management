@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, FileText, Save, Loader2 } from "lucide-react";
+import { ArrowLeft, FileText, Save } from "lucide-react";
 import { toLocalDateStr } from "@/lib/dates";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -212,26 +212,20 @@ function InvoiceEditorLoaded({
           <Button
             variant="outline"
             onClick={handleSave}
-            disabled={saveMutation.isPending || !invoiceNumber}
+            disabled={!invoiceNumber}
+            loading={saveMutation.isPending}
             size="icon"
             className="sm:h-9 sm:w-auto sm:px-4"
           >
-            {saveMutation.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin sm:mr-2" />
-            ) : (
-              <Save className="h-4 w-4 sm:mr-2" />
-            )}
+            <Save className="h-4 w-4 sm:mr-2" />
             <span className="hidden sm:inline">{t("common.save")}</span>
           </Button>
           <Button
             onClick={handleGenerate}
-            disabled={saveMutation.isPending || !invoiceNumber}
+            disabled={!invoiceNumber}
+            loading={saveMutation.isPending}
           >
-            {saveMutation.isPending ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <FileText className="mr-2 h-4 w-4" />
-            )}
+            <FileText className="mr-2 h-4 w-4" />
             {t("invoices.generatePdf")}
           </Button>
         </div>

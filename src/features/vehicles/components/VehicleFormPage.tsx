@@ -58,7 +58,7 @@ export default function VehicleFormPage() {
     control,
     watch,
     setValue,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<VehicleFormData>({
     resolver: zodResolver(vehicleSchema) as never,
     values: (isEdit && vehicle
@@ -240,7 +240,7 @@ export default function VehicleFormPage() {
             </div>
 
             <div className="flex gap-2">
-              <Button type="submit" disabled={isSubmitting}>
+              <Button type="submit" loading={createMutation.isPending || updateMutation.isPending}>
                 {t('common.save')}
               </Button>
               <Button variant="outline" type="button" onClick={() => navigate(-1)}>

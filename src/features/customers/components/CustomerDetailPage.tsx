@@ -326,7 +326,7 @@ export default function CustomerDetailPage() {
             <Button
               variant="destructive"
               onClick={() => deleteCustomerMutation.mutate(id!)}
-              disabled={deleteCustomerMutation.isPending}
+              loading={deleteCustomerMutation.isPending}
             >
               {t('common.delete')}
             </Button>

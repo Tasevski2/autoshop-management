@@ -77,8 +77,8 @@ export default function LoginPage() {
             {error && (
               <p className="text-sm text-destructive">{error}</p>
             )}
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? t('common.loading') : t('auth.login')}
+            <Button type="submit" className="w-full" loading={isSubmitting}>
+              {t('auth.login')}
             </Button>
           </form>
         </CardContent>

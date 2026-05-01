@@ -127,7 +127,8 @@ export default function BrandsModelsPage() {
             <Button
               type="submit"
               size="sm"
-              disabled={!newBrandName.trim() || createBrandMutation.isPending}
+              disabled={!newBrandName.trim()}
+              loading={createBrandMutation.isPending}
             >
               <Plus className="mr-1 h-4 w-4" />
               {t('brands.addBrand')}
@@ -220,7 +221,8 @@ export default function BrandsModelsPage() {
                 <Button
                   type="submit"
                   size="sm"
-                  disabled={!newModelName.trim() || createModelMutation.isPending}
+                  disabled={!newModelName.trim()}
+                  loading={createModelMutation.isPending}
                 >
                   <Plus className="mr-1 h-4 w-4" />
                   {t('brands.addModel')}
@@ -290,7 +292,7 @@ export default function BrandsModelsPage() {
             <Button variant="outline" onClick={() => setDeleteBrandTarget(null)}>
               {t('common.cancel')}
             </Button>
-            <Button variant="destructive" onClick={confirmDeleteBrand} disabled={deleteBrandMutation.isPending}>
+            <Button variant="destructive" onClick={confirmDeleteBrand} loading={deleteBrandMutation.isPending}>
               {t('common.delete')}
             </Button>
           </DialogFooter>
@@ -308,7 +310,7 @@ export default function BrandsModelsPage() {
             <Button variant="outline" onClick={() => setDeleteModelTarget(null)}>
               {t('common.cancel')}
             </Button>
-            <Button variant="destructive" onClick={confirmDeleteModel} disabled={deleteModelMutation.isPending}>
+            <Button variant="destructive" onClick={confirmDeleteModel} loading={deleteModelMutation.isPending}>
               {t('common.delete')}
             </Button>
           </DialogFooter>

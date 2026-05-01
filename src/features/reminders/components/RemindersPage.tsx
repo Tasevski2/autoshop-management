@@ -161,7 +161,7 @@ function RemindersTable({
                             updates: { is_active: false },
                           })
                         }
-                        disabled={deactivateMutation.isPending}
+                        loading={deactivateMutation.isPending}
                       >
                         <X className="h-4 w-4" />
                       </Button>

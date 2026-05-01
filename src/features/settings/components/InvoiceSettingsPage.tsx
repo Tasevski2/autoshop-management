@@ -157,7 +157,7 @@ export default function InvoiceSettingsPage() {
             </div>
           </div>
 
-          <Button type="submit" disabled={updateMutation.isPending}>
+          <Button type="submit" loading={updateMutation.isPending}>
             {t('common.save')}
           </Button>
         </form>
