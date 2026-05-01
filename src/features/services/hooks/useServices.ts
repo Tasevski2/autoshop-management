@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router'
 import {
   fetchServices,
@@ -255,8 +255,17 @@ export function useVehicleOptions(search: string) {
 }
 
 export function usePartOptions(search: string) {
-  return useQuery({
+  const query = useInfiniteQuery({
     queryKey: ['parts', 'options', search],
-    queryFn: () => fetchPartOptions(search),
+    queryFn: ({ pageParam }) => fetchPartOptions(search, pageParam),
+    initialPageParam: 0,
+    getNextPageParam: (last) => (last.page < last.totalPages - 1 ? last.page + 1 : undefined),
   })
+
+  return {
+    options: query.data?.pages.flatMap((p) => p.data) ?? [],
+    fetchNextPage: query.fetchNextPage,
+    hasNextPage: query.hasNextPage,
+    isFetchingNextPage: query.isFetchingNextPage,
+  }
 }

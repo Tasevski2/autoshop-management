@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+import { Loader2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { usePartOptions } from '@/features/services/hooks/useServices'
 
@@ -19,7 +20,7 @@ export default function PartAutocomplete({ value, onChange, onSelect }: PartAuto
   const inputRef = useRef<HTMLInputElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
-  const { data: options = [] } = usePartOptions(debouncedSearch)
+  const { options, fetchNextPage, hasNextPage, isFetchingNextPage } = usePartOptions(debouncedSearch)
 
   useEffect(() => {
     if (timerRef.current) clearTimeout(timerRef.current)
@@ -68,9 +69,16 @@ export default function PartAutocomplete({ value, onChange, onSelect }: PartAuto
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  const handleDropdownScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget
+    if (el.scrollHeight - el.scrollTop - el.clientHeight < 50 && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage()
+    }
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage])
+
   const dropdown = open && options.length > 0
     ? createPortal(
-        <div ref={dropdownRef} style={dropdownStyle} className="rounded-md border bg-popover shadow-md max-h-48 overflow-y-auto">
+        <div ref={dropdownRef} style={dropdownStyle} className="rounded-md border bg-popover shadow-md max-h-48 overflow-y-auto" onScroll={handleDropdownScroll}>
           {options.map((p) => (
             <button
               key={p.id}
@@ -89,6 +97,11 @@ export default function PartAutocomplete({ value, onChange, onSelect }: PartAuto
               <span className="text-muted-foreground">{p.sell_price.toLocaleString()} ден</span>
             </button>
           ))}
+          {isFetchingNextPage && (
+            <div className="flex justify-center py-2">
+              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            </div>
+          )}
         </div>,
         document.body
       )

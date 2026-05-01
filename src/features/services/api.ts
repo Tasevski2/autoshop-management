@@ -370,19 +370,24 @@ export async function upsertCatalogParts(
   ])
 }
 
-export async function fetchPartOptions(search: string) {
+const PART_OPTIONS_PAGE_SIZE = 20
+
+export async function fetchPartOptions(search: string, page: number) {
+  const from = page * PART_OPTIONS_PAGE_SIZE
+  const to = from + PART_OPTIONS_PAGE_SIZE - 1
+
   let query = supabase
     .from('parts_catalog')
-    .select('id, name, buy_price, sell_price')
+    .select('id, name, buy_price, sell_price', { count: 'exact' })
     .eq('is_active', true)
     .order('name')
-    .limit(10)
+    .range(from, to)
 
   if (search) {
     query = query.ilike('name', `%${sanitizeFilterValue(search)}%`)
   }
 
-  const { data, error } = await query
+  const { data, error, count } = await query
   if (error) throw error
-  return data
+  return { data: data ?? [], page, totalPages: Math.ceil((count ?? 0) / PART_OPTIONS_PAGE_SIZE) }
 }
