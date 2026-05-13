@@ -27,6 +27,7 @@ import {
   useDeletePart,
 } from '@/features/parts-catalog/hooks/usePartsCatalog'
 import type { PartsCatalog, PartsCatalogInsert } from '@/features/parts-catalog/types'
+import { PageSpinner } from '@/components/PageSpinner'
 
 interface PartFormData {
   name: string
@@ -153,7 +154,7 @@ export default function PartsCatalogPage() {
       </div>
 
       {isLoading ? (
-        <p className="text-muted-foreground">{t('common.loading')}</p>
+        <PageSpinner />
       ) : parts.length === 0 ? (
         <p className="text-muted-foreground">{t('parts.noParts')}</p>
       ) : (

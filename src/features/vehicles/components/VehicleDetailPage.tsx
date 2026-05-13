@@ -47,6 +47,7 @@ import {
   useDeleteVehicle,
 } from '@/features/vehicles/hooks/useVehicles'
 import type { ServiceStatus } from '@/features/vehicles/types'
+import { PageSpinner } from '@/components/PageSpinner'
 
 function statusVariant(status: ServiceStatus) {
   switch (status) {
@@ -94,7 +95,7 @@ export default function VehicleDetailPage() {
   const [reminderNote, setReminderNote] = useState('')
 
   if (isLoading || !vehicle) {
-    return <p className="text-muted-foreground">{t('common.loading')}</p>
+    return <PageSpinner />
   }
 
   const customer = vehicle.customers as { id: string; full_name: string; phone: string | null } | null

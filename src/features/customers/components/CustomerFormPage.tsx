@@ -13,6 +13,7 @@ import {
   useCreateCustomer,
   useUpdateCustomer,
 } from '@/features/customers/hooks/useCustomers'
+import { PageSpinner } from '@/components/PageSpinner'
 
 const customerSchema = z.object({
   full_name: z.string().min(1),
@@ -25,7 +26,8 @@ const customerSchema = z.object({
   notes: z.string().optional().transform((v) => v || null),
 })
 
-type CustomerFormData = z.infer<typeof customerSchema>
+type CustomerFormInput = z.input<typeof customerSchema>
+type CustomerFormOutput = z.output<typeof customerSchema>
 
 export default function CustomerFormPage() {
   const { t } = useTranslation()
@@ -43,8 +45,8 @@ export default function CustomerFormPage() {
     watch,
     setValue,
     formState: { errors },
-  } = useForm<CustomerFormData>({
-    resolver: zodResolver(customerSchema) as never,
+  } = useForm<CustomerFormInput, unknown, CustomerFormOutput>({
+    resolver: zodResolver(customerSchema),
     values: isEdit && customer
       ? {
           full_name: customer.full_name,
@@ -68,7 +70,7 @@ export default function CustomerFormPage() {
         },
   })
 
-  const onSubmit = (data: CustomerFormData) => {
+  const onSubmit = (data: CustomerFormOutput) => {
     if (isEdit) {
       updateMutation.mutate(data)
     } else {
@@ -77,7 +79,7 @@ export default function CustomerFormPage() {
   }
 
   if (isEdit && loadingCustomer) {
-    return <p className="text-muted-foreground">{t('common.loading')}</p>
+    return <PageSpinner />
   }
 
   return (
@@ -98,7 +100,7 @@ export default function CustomerFormPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit as never)} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="full_name">{t('customers.name')} *</Label>
               <Input id="full_name" {...register('full_name')} />

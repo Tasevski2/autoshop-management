@@ -1,7 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import type { InvoiceInsert } from './types'
-
-const PAGE_SIZE = 20
+import { PAGE_SIZE } from '@/lib/constants'
 
 export async function fetchInvoiceData(serviceId: string) {
   const [{ data: { user } }, serviceResult, partsResult, totalsResult] = await Promise.all([

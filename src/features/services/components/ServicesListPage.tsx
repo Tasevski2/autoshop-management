@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/table'
 import { useServices, useUpdateServiceStatus, useDeleteService } from '@/features/services/hooks/useServices'
 import type { ServiceStatus } from '@/features/services/types'
+import { PageSpinner } from '@/components/PageSpinner'
 
 const STATUSES: ServiceStatus[] = ['in_progress', 'completed', 'invoiced', 'partially_paid', 'paid', 'cancelled']
 
@@ -141,7 +142,7 @@ export default function ServicesListPage() {
       </div>
 
       {isLoading ? (
-        <p className="text-muted-foreground">{t('common.loading')}</p>
+        <PageSpinner />
       ) : services.length === 0 ? (
         <p className="text-muted-foreground">{t('common.noResults')}</p>
       ) : (

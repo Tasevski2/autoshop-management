@@ -31,7 +31,8 @@
     "page": "Page {{current}} of {{total}}",
     "required": "This field is required",
     "saved": "Saved successfully",
-    "error": "An error occurred"
+    "error": "An error occurred",
+    "backHome": "Back to home"
   },
   "theme": {
     "dark": "Dark Mode",

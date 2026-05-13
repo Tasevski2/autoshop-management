@@ -1,5 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router'
+import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import {
   fetchPayments,
   fetchVehicleServicesWithTotals,
@@ -35,6 +37,7 @@ export function useVehicleServicesWithTotals(vehicleId: string | undefined) {
 export function useCreatePaymentFromForm() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (data: PaymentInsert) => createPayment(data),
@@ -48,11 +51,13 @@ export function useCreatePaymentFromForm() {
       queryClient.invalidateQueries({ queryKey: ['reports'] })
       navigate(-1)
     },
+    onError: () => { toast.error(t('common.error')) },
   })
 }
 
 export function useDeletePaymentFromList() {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (id: string) => deletePayment(id),
@@ -64,5 +69,6 @@ export function useDeletePaymentFromList() {
       queryClient.invalidateQueries({ queryKey: ['dashboard', 'unpaid'] })
       queryClient.invalidateQueries({ queryKey: ['reports'] })
     },
+    onError: () => { toast.error(t('common.error')) },
   })
 }

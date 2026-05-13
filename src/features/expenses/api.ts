@@ -1,10 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import type { ExpenseInsert, ExpenseUpdate, ExpenseCategory } from './types'
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const rpc = (supabase as any).rpc.bind(supabase)
-
-const PAGE_SIZE = 20
+import { PAGE_SIZE } from '@/lib/constants'
 
 export async function fetchExpenses({
   page = 0,
@@ -58,11 +54,11 @@ export async function fetchExpenseTotals({
   dateFrom?: string
   dateTo?: string
 } = {}) {
-  const { data, error } = await rpc('get_expense_totals', {
-    p_category: category ?? null,
-    p_date_from: dateFrom ?? null,
-    p_date_to: dateTo ?? null,
-  }) as { data: { category: string; total: number }[] | null; error: Error | null }
+  const { data, error } = await supabase.rpc('get_expense_totals', {
+    p_category: category,
+    p_date_from: dateFrom,
+    p_date_to: dateTo,
+  })
 
   if (error) throw error
 

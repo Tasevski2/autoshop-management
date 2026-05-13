@@ -1,8 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import { sanitizeFilterValue } from '@/lib/utils'
 import type { PartsCatalogInsert, PartsCatalogUpdate } from './types'
-
-const PAGE_SIZE = 20
+import { PAGE_SIZE } from '@/lib/constants'
 
 export async function fetchParts({
   page = 0,

@@ -1,5 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router'
+import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import {
   fetchVehicles,
   fetchVehicle,
@@ -56,6 +58,7 @@ export function useVehiclePhotos(vehicleId: string) {
 export function useCreateVehicle() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (data: VehicleInsert) => createVehicle(data),
@@ -63,12 +66,14 @@ export function useCreateVehicle() {
       queryClient.invalidateQueries({ queryKey: ['vehicles'] })
       navigate(`/vehicles/${vehicle.id}`)
     },
+    onError: () => { toast.error(t('common.error')) },
   })
 }
 
 export function useUpdateVehicle(id: string) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (data: VehicleUpdate) => updateVehicle(id, data),
@@ -76,12 +81,14 @@ export function useUpdateVehicle(id: string) {
       queryClient.invalidateQueries({ queryKey: ['vehicles'] })
       navigate(`/vehicles/${id}`)
     },
+    onError: () => { toast.error(t('common.error')) },
   })
 }
 
 export function useDeleteVehicle() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (id: string) => deleteVehicle(id),
@@ -92,11 +99,13 @@ export function useDeleteVehicle() {
       queryClient.invalidateQueries({ queryKey: ['photos', 'by-vehicle', id] })
       navigate('/vehicles')
     },
+    onError: () => { toast.error(t('common.error')) },
   })
 }
 
 export function useCreateReminder(vehicleId: string) {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (data: ReminderInsert) => createReminder(data),
@@ -105,11 +114,13 @@ export function useCreateReminder(vehicleId: string) {
       queryClient.invalidateQueries({ queryKey: ['reminders', 'by-vehicle', vehicleId] })
       queryClient.invalidateQueries({ queryKey: ['dashboard', 'reminders'] })
     },
+    onError: () => { toast.error(t('common.error')) },
   })
 }
 
 export function useUpdateReminder(vehicleId: string) {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: ReminderUpdate }) => updateReminder(id, data),
@@ -118,6 +129,7 @@ export function useUpdateReminder(vehicleId: string) {
       queryClient.invalidateQueries({ queryKey: ['reminders', 'by-vehicle', vehicleId] })
       queryClient.invalidateQueries({ queryKey: ['dashboard', 'reminders'] })
     },
+    onError: () => { toast.error(t('common.error')) },
   })
 }
 

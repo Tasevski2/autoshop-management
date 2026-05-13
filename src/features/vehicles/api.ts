@@ -1,8 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import { sanitizeFilterValue } from '@/lib/utils'
 import type { VehicleInsert, VehicleUpdate, ReminderInsert, ReminderUpdate } from './types'
-
-const PAGE_SIZE = 20
+import { PAGE_SIZE, DETAIL_PAGE_SIZE } from '@/lib/constants'
 
 export async function fetchVehicles({
   page = 0,
@@ -54,8 +53,6 @@ export async function fetchVehicle(id: string) {
   if (error) throw error
   return data
 }
-
-const DETAIL_PAGE_SIZE = 10
 
 export async function fetchVehicleServices(vehicleId: string, { page = 0 }: { page?: number } = {}) {
   const from = page * DETAIL_PAGE_SIZE

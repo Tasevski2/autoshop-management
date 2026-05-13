@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { useCustomers, useDeleteCustomer } from '@/features/customers/hooks/useCustomers'
+import { PageSpinner } from '@/components/PageSpinner'
 
 export default function CustomersListPage() {
   const { t } = useTranslation()
@@ -83,7 +84,7 @@ export default function CustomersListPage() {
       </div>
 
       {isLoading ? (
-        <p className="text-muted-foreground">{t('common.loading')}</p>
+        <PageSpinner />
       ) : customers.length === 0 ? (
         <p className="text-muted-foreground">{t('common.noResults')}</p>
       ) : (

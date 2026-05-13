@@ -23,6 +23,7 @@ import type {
   InvoiceSeller,
   InvoiceBuyer,
 } from "@/features/invoices/types";
+import { PageSpinner } from '@/components/PageSpinner'
 
 function buildInitialItems(
   parts: { name: string; quantity: number; sell_price: number }[],
@@ -321,7 +322,6 @@ function InvoiceEditorLoaded({
 }
 
 export default function InvoiceEditorPage() {
-  const { t } = useTranslation();
   const { id: serviceId } = useParams<{ id: string }>();
 
   const { data, isLoading } = useInvoiceData(serviceId!);
@@ -329,7 +329,7 @@ export default function InvoiceEditorPage() {
     useExistingInvoice(serviceId!);
 
   if (isLoading || loadingInvoice || !data) {
-    return <p className="text-muted-foreground">{t("common.loading")}</p>;
+    return <PageSpinner />;
   }
 
   return (

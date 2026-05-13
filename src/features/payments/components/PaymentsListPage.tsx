@@ -22,6 +22,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { usePayments, useDeletePaymentFromList } from '@/features/payments/hooks/usePayments'
+import { PageSpinner } from '@/components/PageSpinner'
 
 export default function PaymentsListPage() {
   const { t } = useTranslation()
@@ -79,7 +80,7 @@ export default function PaymentsListPage() {
       </div>
 
       {isLoading ? (
-        <p className="text-muted-foreground">{t('common.loading')}</p>
+        <PageSpinner />
       ) : payments.length === 0 ? (
         <p className="text-muted-foreground">{t('payments.noPayments')}</p>
       ) : (

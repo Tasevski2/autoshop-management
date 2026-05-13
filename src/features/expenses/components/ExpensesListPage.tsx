@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/table'
 import { useExpenses, useExpenseTotals, useDeleteExpense } from '@/features/expenses/hooks/useExpenses'
 import type { ExpenseCategory } from '@/features/expenses/types'
+import { PageSpinner } from '@/components/PageSpinner'
 
 const CATEGORIES: ExpenseCategory[] = [
   'rent', 'utilities', 'tools', 'salary', 'supplies',
@@ -136,7 +137,7 @@ export default function ExpensesListPage() {
       </div>
 
       {isLoading ? (
-        <p className="text-muted-foreground">{t('common.loading')}</p>
+        <PageSpinner />
       ) : expenses.length === 0 ? (
         <p className="text-muted-foreground">{t('expenses.noExpenses')}</p>
       ) : (

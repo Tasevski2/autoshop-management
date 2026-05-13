@@ -1,8 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import { sanitizeFilterValue } from '@/lib/utils'
 import type { CustomerInsert, CustomerUpdate } from './types'
-
-const PAGE_SIZE = 20
+import { PAGE_SIZE, DETAIL_PAGE_SIZE } from '@/lib/constants'
 
 export async function fetchCustomers({
   page = 0,
@@ -64,7 +63,6 @@ export async function fetchCustomerVehicles(customerId: string) {
   return data
 }
 
-const DETAIL_PAGE_SIZE = 10
 
 export async function fetchCustomerServices(customerId: string, { page = 0 }: { page?: number } = {}) {
   const { data: vehicles, error: vError } = await supabase

@@ -20,6 +20,7 @@ import {
   useCreateModel,
   useDeleteModel,
 } from '@/features/settings/hooks/useBrandsModels'
+import { PageSpinner } from '@/components/PageSpinner'
 
 export default function BrandsModelsPage() {
   const { t } = useTranslation()
@@ -150,7 +151,7 @@ export default function BrandsModelsPage() {
 
           {/* Brand list */}
           {loadingBrands ? (
-            <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
+            <PageSpinner />
           ) : brands.length === 0 ? (
             <p className="text-sm text-muted-foreground">{t('brands.noBrands')}</p>
           ) : filteredBrands.length === 0 ? (
@@ -244,7 +245,7 @@ export default function BrandsModelsPage() {
 
               {/* Model list */}
               {loadingModels ? (
-                <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
+                <PageSpinner />
               ) : models.length === 0 ? (
                 <p className="text-sm text-muted-foreground">{t('brands.noModels')}</p>
               ) : filteredModels.length === 0 ? (

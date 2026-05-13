@@ -18,6 +18,7 @@ import { useCustomer } from '@/features/customers/hooks/useCustomers'
 import CustomerPicker from './CustomerPicker'
 import BrandPicker from './BrandPicker'
 import ModelPicker from './ModelPicker'
+import { PageSpinner } from '@/components/PageSpinner'
 
 const ENGINE_TYPES = ['petrol', 'diesel', 'hybrid', 'electric'] as const
 
@@ -35,7 +36,8 @@ const vehicleSchema = z.object({
   customer_id: z.string().min(1),
 })
 
-type VehicleFormData = z.infer<typeof vehicleSchema>
+type VehicleFormInput = z.input<typeof vehicleSchema>
+type VehicleFormOutput = z.output<typeof vehicleSchema>
 
 export default function VehicleFormPage() {
   const { t } = useTranslation()
@@ -59,8 +61,8 @@ export default function VehicleFormPage() {
     watch,
     setValue,
     formState: { errors },
-  } = useForm<VehicleFormData>({
-    resolver: zodResolver(vehicleSchema) as never,
+  } = useForm<VehicleFormInput, unknown, VehicleFormOutput>({
+    resolver: zodResolver(vehicleSchema),
     values: (isEdit && vehicle
       ? {
           plate_number: vehicle.plate_number,
@@ -77,10 +79,10 @@ export default function VehicleFormPage() {
         }
       : presetCustomerId
         ? { customer_id: presetCustomerId, plate_number: '', brand: '' }
-        : undefined) as VehicleFormData | undefined,
+        : undefined) as VehicleFormInput | undefined,
   })
 
-  const onSubmit = (data: VehicleFormData) => {
+  const onSubmit = (data: VehicleFormOutput) => {
     if (isEdit) {
       const { customer_id, ...updates } = data
       void customer_id
@@ -91,7 +93,7 @@ export default function VehicleFormPage() {
   }
 
   if (isEdit && loadingVehicle) {
-    return <p className="text-muted-foreground">{t('common.loading')}</p>
+    return <PageSpinner />
   }
 
   const customerDisplayName = isEdit
@@ -116,7 +118,7 @@ export default function VehicleFormPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit as never)} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Customer picker */}
             <div className="space-y-2">
               <Label>{t('vehicles.owner')} *</Label>

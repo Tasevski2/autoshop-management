@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate, Outlet } from 'react-router'
 import { lazy, Suspense } from 'react'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import RootLayout from '@/components/RootLayout'
+import { RouteErrorBoundary } from '@/components/RouteErrorBoundary'
 
 const DashboardPage = lazy(() => import('@/features/dashboard/components/DashboardPage'))
 const LoginPage = lazy(() => import('@/features/auth/components/LoginPage'))
@@ -75,6 +76,7 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: <AuthGate />,
+    errorElement: <RouteErrorBoundary />,
     children: [
       {
         index: true,

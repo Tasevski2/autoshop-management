@@ -1,5 +1,7 @@
 import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router'
+import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import {
   fetchServices,
   fetchService,
@@ -78,6 +80,8 @@ export function useCreateService() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
+  const { t } = useTranslation()
+
   return useMutation({
     mutationFn: async ({
       service,
@@ -104,12 +108,14 @@ export function useCreateService() {
       })
       navigate(`/services/${created.id}`)
     },
+    onError: () => { toast.error(t('common.error')) },
   })
 }
 
 export function useUpdateService(id: string) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: async ({
@@ -139,11 +145,13 @@ export function useUpdateService(id: string) {
       })
       navigate(`/services/${id}`)
     },
+    onError: () => { toast.error(t('common.error')) },
   })
 }
 
 export function useUpdateServiceStatus(id: string) {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (status: ServiceStatus) => updateService(id, { status }),
@@ -156,12 +164,14 @@ export function useUpdateServiceStatus(id: string) {
       queryClient.invalidateQueries({ queryKey: ['dashboard', 'unpaid'] })
       queryClient.invalidateQueries({ queryKey: ['reports'] })
     },
+    onError: () => { toast.error(t('common.error')) },
   })
 }
 
 export function useDeleteService() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (id: string) => deleteService(id),
@@ -178,22 +188,26 @@ export function useDeleteService() {
       queryClient.invalidateQueries({ queryKey: ['reports'] })
       navigate('/services')
     },
+    onError: () => { toast.error(t('common.error')) },
   })
 }
 
 export function useUploadServiceImage(serviceId: string) {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (file: File) => uploadServiceImage(serviceId, file),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['service-images', 'by-service', serviceId] })
     },
+    onError: () => { toast.error(t('common.error')) },
   })
 }
 
 export function useDeleteServiceImage(serviceId: string) {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: ({ id, storagePath }: { id: string; storagePath: string }) =>
@@ -201,6 +215,7 @@ export function useDeleteServiceImage(serviceId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['service-images', 'by-service', serviceId] })
     },
+    onError: () => { toast.error(t('common.error')) },
   })
 }
 
@@ -214,6 +229,7 @@ export function useServicePayments(serviceId: string | undefined) {
 
 export function useCreatePayment(serviceId: string) {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (data: PaymentInsert) => createPayment(data),
@@ -226,11 +242,13 @@ export function useCreatePayment(serviceId: string) {
       queryClient.invalidateQueries({ queryKey: ['dashboard', 'unpaid'] })
       queryClient.invalidateQueries({ queryKey: ['reports'] })
     },
+    onError: () => { toast.error(t('common.error')) },
   })
 }
 
 export function useDeletePayment(serviceId: string) {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (id: string) => deletePayment(id),
@@ -243,6 +261,7 @@ export function useDeletePayment(serviceId: string) {
       queryClient.invalidateQueries({ queryKey: ['dashboard', 'unpaid'] })
       queryClient.invalidateQueries({ queryKey: ['reports'] })
     },
+    onError: () => { toast.error(t('common.error')) },
   })
 }
 

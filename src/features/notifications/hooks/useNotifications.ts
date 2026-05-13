@@ -1,4 +1,6 @@
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import {
   fetchUndismissedNotifications,
   dismissNotification,
@@ -28,22 +30,26 @@ export function useNotifications() {
 
 export function useDismissNotification() {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: dismissNotification,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] })
     },
+    onError: () => { toast.error(t('common.error')) },
   })
 }
 
 export function useDismissAllNotifications() {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: dismissAllNotifications,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] })
     },
+    onError: () => { toast.error(t('common.error')) },
   })
 }

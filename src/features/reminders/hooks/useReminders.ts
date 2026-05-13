@@ -1,4 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import { fetchAllReminders, fetchReminder, createReminder, updateReminder } from '@/features/reminders/api'
 import type { ReminderUpdate } from '@/features/reminders/types'
 import type { ReminderInsert } from '@/features/vehicles/types'
@@ -21,6 +23,7 @@ export function useReminder(id: string | undefined) {
 
 export function useUpdateReminderFromPage() {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: ReminderUpdate }) =>
@@ -29,11 +32,13 @@ export function useUpdateReminderFromPage() {
       queryClient.invalidateQueries({ queryKey: ['reminders'] })
       queryClient.invalidateQueries({ queryKey: ['dashboard', 'reminders'] })
     },
+    onError: () => { toast.error(t('common.error')) },
   })
 }
 
 export function useCreateReminderFromPage() {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (data: ReminderInsert) => createReminder(data),
@@ -41,11 +46,13 @@ export function useCreateReminderFromPage() {
       queryClient.invalidateQueries({ queryKey: ['reminders'] })
       queryClient.invalidateQueries({ queryKey: ['dashboard', 'reminders'] })
     },
+    onError: () => { toast.error(t('common.error')) },
   })
 }
 
 export function useDeactivateReminder() {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: ReminderUpdate }) =>
@@ -54,5 +61,6 @@ export function useDeactivateReminder() {
       queryClient.invalidateQueries({ queryKey: ['reminders'] })
       queryClient.invalidateQueries({ queryKey: ['dashboard', 'reminders'] })
     },
+    onError: () => { toast.error(t('common.error')) },
   })
 }

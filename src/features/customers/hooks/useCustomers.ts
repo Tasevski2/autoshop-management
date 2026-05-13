@@ -1,5 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router'
+import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import {
   fetchCustomers,
   fetchCustomer,
@@ -45,6 +47,7 @@ export function useCustomerServices(customerId: string, page = 0) {
 export function useCreateCustomer() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (data: Omit<CustomerInsert, 'user_id'>) => createCustomer(data),
@@ -52,12 +55,14 @@ export function useCreateCustomer() {
       queryClient.invalidateQueries({ queryKey: ['customers'] })
       navigate(`/customers/${customer.id}`)
     },
+    onError: () => { toast.error(t('common.error')) },
   })
 }
 
 export function useUpdateCustomer(id: string) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (data: CustomerUpdate) => updateCustomer(id, data),
@@ -66,12 +71,14 @@ export function useUpdateCustomer(id: string) {
       queryClient.invalidateQueries({ queryKey: ['invoices'] })
       navigate(`/customers/${id}`)
     },
+    onError: () => { toast.error(t('common.error')) },
   })
 }
 
 export function useDeleteCustomer() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (id: string) => deleteCustomer(id),
@@ -81,5 +88,6 @@ export function useDeleteCustomer() {
       queryClient.invalidateQueries({ queryKey: ['services', 'by-customer', id] })
       navigate('/customers')
     },
+    onError: () => { toast.error(t('common.error')) },
   })
 }

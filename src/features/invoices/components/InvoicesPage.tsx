@@ -22,6 +22,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useInvoices, useDeleteInvoice } from '@/features/invoices/hooks/useInvoices'
+import { PageSpinner } from '@/components/PageSpinner'
 
 export default function InvoicesPage() {
   const { t } = useTranslation()
@@ -73,7 +74,7 @@ export default function InvoicesPage() {
 
       {/* Table */}
       {isLoading ? (
-        <p className="text-muted-foreground">{t('common.loading')}</p>
+        <PageSpinner />
       ) : invoices.length === 0 ? (
         <p className="text-muted-foreground">{t('invoices.noInvoices')}</p>
       ) : (

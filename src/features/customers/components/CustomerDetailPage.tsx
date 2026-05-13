@@ -45,6 +45,7 @@ import {
   useDeleteCustomer,
 } from '@/features/customers/hooks/useCustomers'
 import type { ServiceStatus } from '@/features/customers/types'
+import { PageSpinner } from '@/components/PageSpinner'
 
 function statusVariant(status: ServiceStatus) {
   switch (status) {
@@ -79,7 +80,7 @@ export default function CustomerDetailPage() {
   const [notesValue, setNotesValue] = useState('')
 
   if (isLoading || !customer) {
-    return <p className="text-muted-foreground">{t('common.loading')}</p>
+    return <PageSpinner />
   }
 
   const startEditNotes = () => {

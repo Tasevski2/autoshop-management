@@ -13,6 +13,7 @@ import {
   useUpdateExpense,
 } from '@/features/expenses/hooks/useExpenses'
 import type { ExpenseCategory } from '@/features/expenses/types'
+import { PageSpinner } from '@/components/PageSpinner'
 
 const CATEGORIES: ExpenseCategory[] = [
   'rent', 'utilities', 'tools', 'salary', 'supplies',
@@ -162,13 +163,12 @@ function ExpenseForm({
 }
 
 export default function ExpenseFormPage() {
-  const { t } = useTranslation()
   const { id } = useParams()
   const isEdit = Boolean(id)
   const { data: existing, isLoading } = useExpense(id)
 
   if (isEdit && isLoading) {
-    return <p className="text-muted-foreground">{t('common.loading')}</p>
+    return <PageSpinner />
   }
 
   if (isEdit && existing) {

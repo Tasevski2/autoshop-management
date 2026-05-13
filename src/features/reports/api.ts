@@ -18,20 +18,16 @@ import type {
 } from './types'
 import { detectBucketType, getBucketLabel } from './utils'
 
-// Helper to call RPCs without generated types
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const rpc = (supabase as any).rpc.bind(supabase)
-
 // ─── Financial Tab RPCs ──────────────────────────────────────
 
 export async function fetchFinancialSummary(
   dateFrom: string,
   dateTo: string
 ): Promise<FinancialSummary> {
-  const { data, error } = await rpc('get_financial_summary', {
+  const { data, error } = await supabase.rpc('get_financial_summary', {
     p_from: dateFrom,
     p_to: dateTo,
-  }) as { data: Record<string, unknown>[] | null; error: Error | null }
+  })
 
   if (error) throw error
   if (!data || data.length === 0) {
@@ -55,10 +51,10 @@ export async function fetchRevenueByBucket(
   dateFrom: string,
   dateTo: string
 ): Promise<TimeBucketRevenue[]> {
-  const { data, error } = await rpc('get_revenue_by_bucket', {
+  const { data, error } = await supabase.rpc('get_revenue_by_bucket', {
     p_from: dateFrom,
     p_to: dateTo,
-  }) as { data: Record<string, unknown>[] | null; error: Error | null }
+  })
 
   if (error) throw error
   if (!data) return []
@@ -79,10 +75,10 @@ export async function fetchExpensesByCategory(
   dateFrom: string,
   dateTo: string
 ): Promise<ExpenseCategoryItem[]> {
-  const { data, error } = await rpc('get_expenses_by_category', {
+  const { data, error } = await supabase.rpc('get_expenses_by_category', {
     p_from: dateFrom,
     p_to: dateTo,
-  }) as { data: Record<string, unknown>[] | null; error: Error | null }
+  })
 
   if (error) throw error
   if (!data || data.length === 0) return []
@@ -99,10 +95,10 @@ export async function fetchPaymentsByMethod(
   dateFrom: string,
   dateTo: string
 ): Promise<PaymentMethodItem[]> {
-  const { data, error } = await rpc('get_payments_by_method', {
+  const { data, error } = await supabase.rpc('get_payments_by_method', {
     p_from: dateFrom,
     p_to: dateTo,
-  }) as { data: Record<string, unknown>[] | null; error: Error | null }
+  })
 
   if (error) throw error
   if (!data || data.length === 0) return []
@@ -119,10 +115,10 @@ export async function fetchDailyBreakdown(
   dateFrom: string,
   dateTo: string
 ): Promise<DailyBreakdownRow[]> {
-  const { data, error } = await rpc('get_daily_breakdown', {
+  const { data, error } = await supabase.rpc('get_daily_breakdown', {
     p_from: dateFrom,
     p_to: dateTo,
-  }) as { data: Record<string, unknown>[] | null; error: Error | null }
+  })
 
   if (error) throw error
   if (!data) return []
@@ -146,10 +142,7 @@ export async function fetchDailyBreakdown(
 // ─── Revenue Trend RPC ───────────────────────────────────────
 
 export async function fetchRevenueTrend(): Promise<MonthlyTrendPoint[]> {
-  const { data, error } = await rpc('get_revenue_trend') as {
-    data: Record<string, unknown>[] | null
-    error: Error | null
-  }
+  const { data, error } = await supabase.rpc('get_revenue_trend')
 
   if (error) throw error
   if (!data || data.length === 0) return []
@@ -175,10 +168,10 @@ export async function fetchCustomerSummary(
   dateFrom: string,
   dateTo: string
 ): Promise<CustomerSummary> {
-  const { data, error } = await rpc('get_customer_summary', {
+  const { data, error } = await supabase.rpc('get_customer_summary', {
     p_from: dateFrom,
     p_to: dateTo,
-  }) as { data: Record<string, unknown>[] | null; error: Error | null }
+  })
 
   if (error) throw error
   if (!data || data.length === 0) {
@@ -201,14 +194,14 @@ export async function fetchCustomerRankings(params: {
   page: number
   pageSize: number
 }): Promise<{ rows: CustomerRankingRow[]; totalCount: number }> {
-  const { data, error } = await rpc('get_customer_rankings', {
+  const { data, error } = await supabase.rpc('get_customer_rankings', {
     p_date_from: params.dateFrom,
     p_date_to: params.dateTo,
     p_sort_column: params.sortColumn,
     p_sort_direction: params.sortDirection,
     p_page: params.page,
     p_page_size: params.pageSize,
-  }) as { data: Record<string, unknown>[] | null; error: Error | null }
+  })
 
   if (error) throw error
   if (!data || data.length === 0) return { rows: [], totalCount: 0 }
@@ -235,10 +228,10 @@ export async function fetchServicesSummary(
   dateFrom: string,
   dateTo: string
 ): Promise<ServicesSummary> {
-  const { data, error } = await rpc('get_services_summary', {
+  const { data, error } = await supabase.rpc('get_services_summary', {
     p_from: dateFrom,
     p_to: dateTo,
-  }) as { data: Record<string, unknown>[] | null; error: Error | null }
+  })
 
   if (error) throw error
   if (!data || data.length === 0) {
@@ -257,10 +250,10 @@ export async function fetchBrandDistribution(
   dateFrom: string,
   dateTo: string
 ): Promise<BrandCount[]> {
-  const { data, error } = await rpc('get_brand_distribution', {
+  const { data, error } = await supabase.rpc('get_brand_distribution', {
     p_from: dateFrom,
     p_to: dateTo,
-  }) as { data: Record<string, unknown>[] | null; error: Error | null }
+  })
 
   if (error) throw error
   return (data ?? []).map((r) => ({
@@ -273,10 +266,10 @@ export async function fetchYearDistribution(
   dateFrom: string,
   dateTo: string
 ): Promise<YearRangeCount[]> {
-  const { data, error } = await rpc('get_year_distribution', {
+  const { data, error } = await supabase.rpc('get_year_distribution', {
     p_from: dateFrom,
     p_to: dateTo,
-  }) as { data: Record<string, unknown>[] | null; error: Error | null }
+  })
 
   if (error) throw error
   return (data ?? []).map((r) => ({
@@ -289,10 +282,10 @@ export async function fetchWeekdayUtilization(
   dateFrom: string,
   dateTo: string
 ): Promise<WeekdayAverage[]> {
-  const { data, error } = await rpc('get_weekday_utilization', {
+  const { data, error } = await supabase.rpc('get_weekday_utilization', {
     p_from: dateFrom,
     p_to: dateTo,
-  }) as { data: Record<string, unknown>[] | null; error: Error | null }
+  })
 
   if (error) throw error
   if (!data) return []
@@ -337,14 +330,14 @@ export async function fetchPartRankings(params: {
   page: number
   pageSize: number
 }): Promise<{ rows: PartRankingRow[]; totalCount: number }> {
-  const { data, error } = await rpc('get_part_rankings', {
+  const { data, error } = await supabase.rpc('get_part_rankings', {
     p_date_from: params.dateFrom,
     p_date_to: params.dateTo,
     p_sort_column: params.sortColumn,
     p_sort_direction: params.sortDirection,
     p_page: params.page,
     p_page_size: params.pageSize,
-  }) as { data: Record<string, unknown>[] | null; error: Error | null }
+  })
 
   if (error) throw error
   if (!data || data.length === 0) return { rows: [], totalCount: 0 }

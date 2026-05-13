@@ -3,8 +3,7 @@ import { sanitizeFilterValue } from '@/lib/utils'
 import { compressImage } from '@/lib/image-compression'
 import { ensureStorageSpace } from '@/lib/storage-manager'
 import type { ServiceInsert, ServiceUpdate, ServicePartInsert, ServiceStatus, PaymentInsert } from './types'
-
-const PAGE_SIZE = 20
+import { PAGE_SIZE } from '@/lib/constants'
 
 export async function fetchServices({
   page = 0,

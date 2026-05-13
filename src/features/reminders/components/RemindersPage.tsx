@@ -14,6 +14,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useReminders, useDeactivateReminder } from '@/features/reminders/hooks/useReminders'
+import { PageSpinner } from '@/components/PageSpinner'
 
 function getDaysUntil(dueDate: string) {
   const today = new Date()
@@ -221,9 +222,7 @@ export default function RemindersPage() {
 
         <TabsContent value="active">
           {loadingActive ? (
-            <p className="text-muted-foreground py-8 text-center text-sm">
-              {t('common.loading')}
-            </p>
+            <PageSpinner />
           ) : activeReminders.length === 0 ? (
             <p className="text-muted-foreground py-8 text-center text-sm">
               {t('reminders.noReminders')}
@@ -257,9 +256,7 @@ export default function RemindersPage() {
 
         <TabsContent value="completed">
           {loadingCompleted ? (
-            <p className="text-muted-foreground py-8 text-center text-sm">
-              {t('common.loading')}
-            </p>
+            <PageSpinner />
           ) : completedReminders.length === 0 ? (
             <p className="text-muted-foreground py-8 text-center text-sm">
               {t('reminders.noCompleted')}

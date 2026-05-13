@@ -11,6 +11,7 @@ import {
   useUserProfile,
   useUpdateUserProfile,
 } from '@/features/settings/hooks/useInvoiceSettings'
+import { PageSpinner } from '@/components/PageSpinner'
 
 const profileSchema = z.object({
   workshop_name: z.string().optional().transform((v) => v || null),
@@ -25,7 +26,8 @@ const profileSchema = z.object({
   next_invoice_number: z.preprocess((v) => (v === '' || v === undefined ? 1 : Number(v)), z.number().int().min(1)),
 })
 
-type ProfileFormData = z.infer<typeof profileSchema>
+type ProfileFormInput = z.input<typeof profileSchema>
+type ProfileFormOutput = z.output<typeof profileSchema>
 
 export default function InvoiceSettingsPage() {
   const { t } = useTranslation()
@@ -36,8 +38,8 @@ export default function InvoiceSettingsPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ProfileFormData>({
-    resolver: zodResolver(profileSchema) as never,
+  } = useForm<ProfileFormInput, unknown, ProfileFormOutput>({
+    resolver: zodResolver(profileSchema),
     values: profile
       ? {
           workshop_name: profile.workshop_name ?? '',
@@ -54,12 +56,12 @@ export default function InvoiceSettingsPage() {
       : undefined,
   })
 
-  const onSubmit = (data: ProfileFormData) => {
+  const onSubmit = (data: ProfileFormOutput) => {
     updateMutation.mutate(data)
   }
 
   if (isLoading) {
-    return <p className="text-muted-foreground">{t('common.loading')}</p>
+    return <PageSpinner />
   }
 
   return (
@@ -68,7 +70,7 @@ export default function InvoiceSettingsPage() {
         <CardTitle>{t('settings.invoiceSettings')}</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(onSubmit as never)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Workshop info */}
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">

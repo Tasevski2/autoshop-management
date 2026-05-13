@@ -1,8 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import type { ReminderUpdate } from './types'
 import type { ReminderInsert } from '@/features/vehicles/types'
-
-const PAGE_SIZE = 20
+import { PAGE_SIZE } from '@/lib/constants'
 
 export async function fetchAllReminders({ active, page = 0 }: { active: boolean; page?: number }) {
   const from = page * PAGE_SIZE

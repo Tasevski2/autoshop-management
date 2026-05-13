@@ -1,6 +1,5 @@
 import { supabase } from '@/lib/supabase'
-
-const PAGE_SIZE = 20
+import { PAGE_SIZE } from '@/lib/constants'
 
 export async function fetchUndismissedNotifications({ page = 0 }: { page?: number } = {}) {
   const from = page * PAGE_SIZE

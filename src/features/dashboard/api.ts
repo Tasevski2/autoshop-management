@@ -9,17 +9,14 @@ function getToday() {
 export async function fetchDashboardStats(): Promise<DashboardStats> {
   const today = getToday()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const rpc = (supabase as any).rpc.bind(supabase)
-
   const [inProgress, unpaidResult, revenueResult, expensesResult] = await Promise.all([
     supabase
       .from('services')
       .select('id', { count: 'exact', head: true })
       .eq('status', 'in_progress'),
-    rpc('get_total_unpaid') as Promise<{ data: number | null; error: Error | null }>,
-    rpc('get_today_revenue', { p_date: today }) as Promise<{ data: number | null; error: Error | null }>,
-    rpc('get_today_expenses', { p_date: today }) as Promise<{ data: number | null; error: Error | null }>,
+    supabase.rpc('get_total_unpaid'),
+    supabase.rpc('get_today_revenue', { p_date: today }),
+    supabase.rpc('get_today_expenses', { p_date: today }),
   ])
 
   if (inProgress.error) throw inProgress.error

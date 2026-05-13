@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { toLocalDateStr } from '@/lib/dates'
 import { useParams, useSearchParams, useNavigate } from 'react-router'
-import { useForm, useFieldArray, useWatch } from 'react-hook-form'
+import { useForm, useFieldArray, useWatch, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useTranslation } from 'react-i18next'
@@ -21,6 +21,7 @@ import { useVehicle } from '@/features/vehicles/hooks/useVehicles'
 import VehiclePicker from './VehiclePicker'
 import PartAutocomplete from './PartAutocomplete'
 import type { ServiceStatus } from '@/features/services/types'
+import { PageSpinner } from '@/components/PageSpinner'
 
 const STATUSES: ServiceStatus[] = ['in_progress', 'completed', 'invoiced', 'partially_paid', 'paid', 'cancelled']
 
@@ -84,8 +85,8 @@ export default function ServiceFormPage() {
     control,
     setValue,
     formState: { errors },
-  } = useForm<ServiceFormData>({
-    resolver: zodResolver(serviceSchema) as never,
+  } = useForm<ServiceFormData, unknown, z.output<typeof serviceSchema>>({
+    resolver: zodResolver(serviceSchema) as Resolver<ServiceFormData, unknown, z.output<typeof serviceSchema>>,
     defaultValues: {
       service_date: toLocalDateStr(),
       labor_cost: '',
@@ -131,7 +132,7 @@ export default function ServiceFormPage() {
     }
   }, [fields.length, append])
 
-  const onSubmit = (data: ServiceFormData) => {
+  const onSubmit = (data: z.output<typeof serviceSchema>) => {
     // Filter out empty rows
     const validParts = data.parts.filter((p) => p.name.trim() !== '')
     const parsedParts = validParts.map((p) => ({
@@ -160,7 +161,7 @@ export default function ServiceFormPage() {
   }
 
   if (isEdit && loadingService) {
-    return <p className="text-muted-foreground">{t('common.loading')}</p>
+    return <PageSpinner />
   }
 
   // Vehicle context display
@@ -206,7 +207,7 @@ export default function ServiceFormPage() {
         </h2>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit as never)} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Vehicle picker (only on create without preset) */}
         {!isEdit && !presetVehicleId && (
           <Card>

@@ -53,6 +53,7 @@ import {
   useDeletePayment,
 } from '@/features/services/hooks/useServices'
 import type { ServiceStatus, PaymentMethod } from '@/features/services/types'
+import { PageSpinner } from '@/components/PageSpinner'
 
 const STATUSES: ServiceStatus[] = ['in_progress', 'completed', 'invoiced', 'partially_paid', 'paid', 'cancelled']
 const PAYMENT_METHODS: PaymentMethod[] = ['cash', 'card', 'bank_transfer', 'other']
@@ -88,7 +89,7 @@ export default function ServiceDetailPage() {
   const deletePaymentMutation = useDeletePayment(id!)
 
   if (isLoading || !service) {
-    return <p className="text-muted-foreground">{t('common.loading')}</p>
+    return <PageSpinner />
   }
 
   const vehicle = service.vehicles as {

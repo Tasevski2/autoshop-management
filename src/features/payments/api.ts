@@ -1,7 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import type { PaymentInsert } from './types'
-
-const PAGE_SIZE = 20
+import { PAGE_SIZE } from '@/lib/constants'
 
 export async function fetchPayments({
   page = 0,

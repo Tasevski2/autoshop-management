@@ -21,6 +21,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useVehicles, useDeleteVehicle } from '@/features/vehicles/hooks/useVehicles'
+import { PageSpinner } from '@/components/PageSpinner'
 
 export default function VehiclesListPage() {
   const { t } = useTranslation()
@@ -83,7 +84,7 @@ export default function VehiclesListPage() {
       </div>
 
       {isLoading ? (
-        <p className="text-muted-foreground">{t('common.loading')}</p>
+        <PageSpinner />
       ) : vehicles.length === 0 ? (
         <p className="text-muted-foreground">{t('common.noResults')}</p>
       ) : (

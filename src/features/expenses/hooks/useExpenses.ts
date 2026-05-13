@@ -1,4 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import {
   fetchExpenses,
   fetchExpenseTotals,
@@ -52,6 +54,7 @@ export function useExpense(id: string | undefined) {
 
 export function useCreateExpense() {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (data: ExpenseInsert) => createExpense(data),
@@ -60,11 +63,13 @@ export function useCreateExpense() {
       queryClient.invalidateQueries({ queryKey: ['dashboard', 'stats'] })
       queryClient.invalidateQueries({ queryKey: ['reports'] })
     },
+    onError: () => { toast.error(t('common.error')) },
   })
 }
 
 export function useUpdateExpense() {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: ExpenseUpdate }) =>
@@ -74,11 +79,13 @@ export function useUpdateExpense() {
       queryClient.invalidateQueries({ queryKey: ['dashboard', 'stats'] })
       queryClient.invalidateQueries({ queryKey: ['reports'] })
     },
+    onError: () => { toast.error(t('common.error')) },
   })
 }
 
 export function useDeleteExpense() {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (id: string) => deleteExpense(id),
@@ -87,5 +94,6 @@ export function useDeleteExpense() {
       queryClient.invalidateQueries({ queryKey: ['dashboard', 'stats'] })
       queryClient.invalidateQueries({ queryKey: ['reports'] })
     },
+    onError: () => { toast.error(t('common.error')) },
   })
 }

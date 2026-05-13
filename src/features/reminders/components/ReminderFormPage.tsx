@@ -12,6 +12,7 @@ import {
   useCreateReminderFromPage,
   useUpdateReminderFromPage,
 } from '@/features/reminders/hooks/useReminders'
+import { PageSpinner } from '@/components/PageSpinner'
 
 function formatVehicleDisplay(v: { plate_number: string; brand: string; model: string | null; engine_capacity?: number | null; engine_designation?: string | null }) {
   let label = `${v.plate_number} — ${v.brand}${v.model ? ` ${v.model}` : ''}`
@@ -166,13 +167,12 @@ function ReminderForm({
 }
 
 export default function ReminderFormPage() {
-  const { t } = useTranslation()
   const { id } = useParams()
   const isEdit = Boolean(id)
   const { data: existing, isLoading } = useReminder(id)
 
   if (isEdit && isLoading) {
-    return <p className="text-muted-foreground">{t('common.loading')}</p>
+    return <PageSpinner />
   }
 
   if (isEdit && existing) {
