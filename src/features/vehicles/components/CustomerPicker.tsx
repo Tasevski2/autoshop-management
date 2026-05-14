@@ -5,6 +5,7 @@ import { X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useCustomerOptions } from '@/features/vehicles/hooks/useVehicles'
+import { DEBOUNCE_DELAY_MS } from '@/lib/constants'
 
 interface CustomerPickerProps {
   value: string | null
@@ -29,7 +30,7 @@ export default function CustomerPicker({ value, displayName, onChange, disabled 
     if (timerRef.current) clearTimeout(timerRef.current)
     timerRef.current = setTimeout(() => {
       setDebouncedSearch(search)
-    }, 300)
+    }, DEBOUNCE_DELAY_MS)
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current)
     }

@@ -14,58 +14,59 @@ import {
   fetchWeekdayUtilization,
   fetchPartRankings,
 } from '../api'
-import type { CustomerSortColumn, PartSortColumn } from '../types'
-
-const STALE_TIME = 2 * 60 * 1000 // 2 minutes — reports are analytical
+import type { CustomerSortColumn, PartSortColumn, SortDirection } from '../types'
+import { REPORTS_STALE_MS } from '../constants'
+import { QUERY_KEYS } from '@/lib/query-keys'
+import { PAGE_SIZE } from '@/lib/constants'
 
 // ─── Financial Tab hooks ──────────────────────────────────────
 
 export function useFinancialSummary(dateFrom: string, dateTo: string) {
   return useQuery({
-    queryKey: ['reports', 'financial-summary', dateFrom, dateTo],
+    queryKey: QUERY_KEYS.reports.financialSummary(dateFrom, dateTo),
     queryFn: () => fetchFinancialSummary(dateFrom, dateTo),
     enabled: !!dateFrom && !!dateTo,
-    staleTime: STALE_TIME,
+    staleTime: REPORTS_STALE_MS,
     placeholderData: (prev) => prev,
   })
 }
 
 export function useRevenueByBucket(dateFrom: string, dateTo: string) {
   return useQuery({
-    queryKey: ['reports', 'revenue-by-bucket', dateFrom, dateTo],
+    queryKey: QUERY_KEYS.reports.revenueByBucket(dateFrom, dateTo),
     queryFn: () => fetchRevenueByBucket(dateFrom, dateTo),
     enabled: !!dateFrom && !!dateTo,
-    staleTime: STALE_TIME,
+    staleTime: REPORTS_STALE_MS,
     placeholderData: (prev) => prev,
   })
 }
 
 export function useExpensesByCategory(dateFrom: string, dateTo: string) {
   return useQuery({
-    queryKey: ['reports', 'expenses-by-category', dateFrom, dateTo],
+    queryKey: QUERY_KEYS.reports.expensesByCategory(dateFrom, dateTo),
     queryFn: () => fetchExpensesByCategory(dateFrom, dateTo),
     enabled: !!dateFrom && !!dateTo,
-    staleTime: STALE_TIME,
+    staleTime: REPORTS_STALE_MS,
     placeholderData: (prev) => prev,
   })
 }
 
 export function usePaymentsByMethod(dateFrom: string, dateTo: string) {
   return useQuery({
-    queryKey: ['reports', 'payments-by-method', dateFrom, dateTo],
+    queryKey: QUERY_KEYS.reports.paymentsByMethod(dateFrom, dateTo),
     queryFn: () => fetchPaymentsByMethod(dateFrom, dateTo),
     enabled: !!dateFrom && !!dateTo,
-    staleTime: STALE_TIME,
+    staleTime: REPORTS_STALE_MS,
     placeholderData: (prev) => prev,
   })
 }
 
 export function useDailyBreakdown(dateFrom: string, dateTo: string) {
   return useQuery({
-    queryKey: ['reports', 'daily-breakdown', dateFrom, dateTo],
+    queryKey: QUERY_KEYS.reports.dailyBreakdown(dateFrom, dateTo),
     queryFn: () => fetchDailyBreakdown(dateFrom, dateTo),
     enabled: !!dateFrom && !!dateTo,
-    staleTime: STALE_TIME,
+    staleTime: REPORTS_STALE_MS,
     placeholderData: (prev) => prev,
   })
 }
@@ -74,9 +75,9 @@ export function useDailyBreakdown(dateFrom: string, dateTo: string) {
 
 export function useRevenueTrend() {
   return useQuery({
-    queryKey: ['reports', 'trend'],
+    queryKey: QUERY_KEYS.reports.trend,
     queryFn: fetchRevenueTrend,
-    staleTime: 5 * 60 * 1000,
+    staleTime: REPORTS_STALE_MS,
   })
 }
 
@@ -84,10 +85,10 @@ export function useRevenueTrend() {
 
 export function useCustomerSummary(dateFrom: string, dateTo: string) {
   return useQuery({
-    queryKey: ['reports', 'customer-summary', dateFrom, dateTo],
+    queryKey: QUERY_KEYS.reports.customerSummary(dateFrom, dateTo),
     queryFn: () => fetchCustomerSummary(dateFrom, dateTo),
     enabled: !!dateFrom && !!dateTo,
-    staleTime: STALE_TIME,
+    staleTime: REPORTS_STALE_MS,
     placeholderData: (prev) => prev,
   })
 }
@@ -96,15 +97,15 @@ export function useCustomerRankings(
   dateFrom: string,
   dateTo: string,
   sortColumn: CustomerSortColumn,
-  sortDirection: 'asc' | 'desc',
+  sortDirection: SortDirection,
   page: number,
-  pageSize: number = 20
+  pageSize: number = PAGE_SIZE
 ) {
   return useQuery({
-    queryKey: ['reports', 'customer-rankings', dateFrom, dateTo, sortColumn, sortDirection, page, pageSize],
+    queryKey: QUERY_KEYS.reports.customerRankings(dateFrom, dateTo, sortColumn, sortDirection, page, pageSize),
     queryFn: () => fetchCustomerRankings({ dateFrom, dateTo, sortColumn, sortDirection, page, pageSize }),
     enabled: !!dateFrom && !!dateTo,
-    staleTime: STALE_TIME,
+    staleTime: REPORTS_STALE_MS,
     placeholderData: (prev) => prev,
   })
 }
@@ -113,40 +114,40 @@ export function useCustomerRankings(
 
 export function useServicesSummary(dateFrom: string, dateTo: string) {
   return useQuery({
-    queryKey: ['reports', 'services-summary', dateFrom, dateTo],
+    queryKey: QUERY_KEYS.reports.servicesSummary(dateFrom, dateTo),
     queryFn: () => fetchServicesSummary(dateFrom, dateTo),
     enabled: !!dateFrom && !!dateTo,
-    staleTime: STALE_TIME,
+    staleTime: REPORTS_STALE_MS,
     placeholderData: (prev) => prev,
   })
 }
 
 export function useBrandDistribution(dateFrom: string, dateTo: string) {
   return useQuery({
-    queryKey: ['reports', 'brand-distribution', dateFrom, dateTo],
+    queryKey: QUERY_KEYS.reports.brandDistribution(dateFrom, dateTo),
     queryFn: () => fetchBrandDistribution(dateFrom, dateTo),
     enabled: !!dateFrom && !!dateTo,
-    staleTime: STALE_TIME,
+    staleTime: REPORTS_STALE_MS,
     placeholderData: (prev) => prev,
   })
 }
 
 export function useYearDistribution(dateFrom: string, dateTo: string) {
   return useQuery({
-    queryKey: ['reports', 'year-distribution', dateFrom, dateTo],
+    queryKey: QUERY_KEYS.reports.yearDistribution(dateFrom, dateTo),
     queryFn: () => fetchYearDistribution(dateFrom, dateTo),
     enabled: !!dateFrom && !!dateTo,
-    staleTime: STALE_TIME,
+    staleTime: REPORTS_STALE_MS,
     placeholderData: (prev) => prev,
   })
 }
 
 export function useWeekdayUtilization(dateFrom: string, dateTo: string) {
   return useQuery({
-    queryKey: ['reports', 'weekday-utilization', dateFrom, dateTo],
+    queryKey: QUERY_KEYS.reports.weekdayUtilization(dateFrom, dateTo),
     queryFn: () => fetchWeekdayUtilization(dateFrom, dateTo),
     enabled: !!dateFrom && !!dateTo,
-    staleTime: STALE_TIME,
+    staleTime: REPORTS_STALE_MS,
     placeholderData: (prev) => prev,
   })
 }
@@ -157,15 +158,15 @@ export function usePartRankings(
   dateFrom: string,
   dateTo: string,
   sortColumn: PartSortColumn,
-  sortDirection: 'asc' | 'desc',
+  sortDirection: SortDirection,
   page: number,
-  pageSize: number = 20
+  pageSize: number = PAGE_SIZE
 ) {
   return useQuery({
-    queryKey: ['reports', 'part-rankings', dateFrom, dateTo, sortColumn, sortDirection, page, pageSize],
+    queryKey: QUERY_KEYS.reports.partRankings(dateFrom, dateTo, sortColumn, sortDirection, page, pageSize),
     queryFn: () => fetchPartRankings({ dateFrom, dateTo, sortColumn, sortDirection, page, pageSize }),
     enabled: !!dateFrom && !!dateTo,
-    staleTime: STALE_TIME,
+    staleTime: REPORTS_STALE_MS,
     placeholderData: (prev) => prev,
   })
 }

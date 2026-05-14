@@ -6,11 +6,8 @@ import {
   Pencil,
   Car,
   Wrench,
-  Bell,
   Camera,
   Plus,
-  Check,
-  X,
   Trash2,
   ChevronLeft,
   ChevronRight,
@@ -18,17 +15,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@/components/ui/dialog'
 import { Separator } from '@/components/ui/separator'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
   Table,
   TableBody,
@@ -37,40 +24,16 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import DeleteConfirmDialog from '@/components/DeleteConfirmDialog'
+import VehicleRemindersSection from './VehicleRemindersSection'
 import {
   useVehicle,
   useVehicleServices,
-  useVehicleReminders,
   useVehiclePhotos,
-  useCreateReminder,
-  useUpdateReminder,
   useDeleteVehicle,
 } from '@/features/vehicles/hooks/useVehicles'
-import type { ServiceStatus } from '@/features/vehicles/types'
+import { serviceStatusVariant } from '@/lib/enums'
 import { PageSpinner } from '@/components/PageSpinner'
-
-function statusVariant(status: ServiceStatus) {
-  switch (status) {
-    case 'paid':
-      return 'default' as const
-    case 'completed':
-    case 'invoiced':
-    case 'partially_paid':
-      return 'secondary' as const
-    case 'in_progress':
-      return 'outline' as const
-    case 'cancelled':
-      return 'destructive' as const
-  }
-}
-
-function daysUntil(dateStr: string) {
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const due = new Date(dateStr)
-  due.setHours(0, 0, 0, 0)
-  return Math.ceil((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
-}
 
 export default function VehicleDetailPage() {
   const { t } = useTranslation()
@@ -81,62 +44,16 @@ export default function VehicleDetailPage() {
   const { data: servicesResult } = useVehicleServices(id!, servicesPage)
   const services = servicesResult?.data ?? []
   const servicesTotalPages = servicesResult?.totalPages ?? 0
-  const { data: reminders = [] } = useVehicleReminders(id!)
   const { data: photos = [] } = useVehiclePhotos(id!)
-  const createReminderMutation = useCreateReminder(id!)
-  const updateReminderMutation = useUpdateReminder(id!)
   const deleteVehicleMutation = useDeleteVehicle()
 
-  const [showReminderForm, setShowReminderForm] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
-  const [editingReminderId, setEditingReminderId] = useState<string | null>(null)
-  const [reminderDueDate, setReminderDueDate] = useState('')
-  const [reminderNotifyDays, setReminderNotifyDays] = useState('10')
-  const [reminderNote, setReminderNote] = useState('')
 
   if (isLoading || !vehicle) {
     return <PageSpinner />
   }
 
   const customer = vehicle.customers as { id: string; full_name: string; phone: string | null } | null
-
-  const startNewReminder = () => {
-    setEditingReminderId(null)
-    setReminderDueDate('')
-    setReminderNotifyDays('10')
-    setReminderNote('')
-    setShowReminderForm(true)
-  }
-
-  const startEditReminder = (r: (typeof reminders)[number]) => {
-    setEditingReminderId(r.id)
-    setReminderDueDate(r.due_date)
-    setReminderNotifyDays(String(r.notify_days_before))
-    setReminderNote(r.note ?? '')
-    setShowReminderForm(true)
-  }
-
-  const saveReminder = () => {
-    if (!reminderDueDate) return
-    if (editingReminderId) {
-      updateReminderMutation.mutate({
-        id: editingReminderId,
-        data: {
-          due_date: reminderDueDate,
-          notify_days_before: parseInt(reminderNotifyDays) || 10,
-          note: reminderNote || null,
-        },
-      })
-    } else {
-      createReminderMutation.mutate({
-        vehicle_id: id!,
-        due_date: reminderDueDate,
-        notify_days_before: parseInt(reminderNotifyDays) || 10,
-        note: reminderNote || null,
-      })
-    }
-    setShowReminderForm(false)
-  }
 
   // Group photos by service date
   const photosByServiceDate = photos.reduce<Record<string, typeof photos>>((acc, photo) => {
@@ -286,7 +203,7 @@ export default function VehicleDetailPage() {
                         {s.service_total != null ? `${s.service_total.toLocaleString()} ден` : '—'}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={statusVariant(s.status)}>
+                        <Badge variant={serviceStatusVariant(s.status)}>
                           {t(`customers.statuses.${s.status}`)}
                         </Badge>
                       </TableCell>
@@ -322,162 +239,7 @@ export default function VehicleDetailPage() {
       </div>
 
       {/* Reminders section */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold flex items-center gap-2">
-            <Bell className="h-5 w-5" />
-            {t('vehicles.reminders')}
-          </h3>
-          {!showReminderForm && (
-            <Button size="sm" variant="outline" onClick={startNewReminder}>
-              <Plus className="mr-1 h-3.5 w-3.5" />
-              {t('vehicles.addReminder')}
-            </Button>
-          )}
-        </div>
-
-        {/* New reminder form (not editing) */}
-        {showReminderForm && !editingReminderId && (
-          <Card className="mb-4">
-            <CardContent className="pt-4">
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                <div className="space-y-1">
-                  <Label htmlFor="reminder-due-date">{t('vehicles.dueDate')}</Label>
-                  <Input
-                    id="reminder-due-date"
-                    type="date"
-                    value={reminderDueDate}
-                    onChange={(e) => setReminderDueDate(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-1">
-                  <Label htmlFor="reminder-notify">{t('vehicles.notifyDaysBefore')}</Label>
-                  <Input
-                    id="reminder-notify"
-                    type="number"
-                    value={reminderNotifyDays}
-                    onChange={(e) => setReminderNotifyDays(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-1">
-                  <Label htmlFor="reminder-note">{t('vehicles.reminderNote')}</Label>
-                  <Input
-                    id="reminder-note"
-                    value={reminderNote}
-                    onChange={(e) => setReminderNote(e.target.value)}
-                  />
-                </div>
-              </div>
-              <div className="flex gap-2 mt-3">
-                <Button size="sm" onClick={saveReminder}>
-                  <Check className="mr-1 h-3.5 w-3.5" />
-                  {t('common.save')}
-                </Button>
-                <Button size="sm" variant="ghost" onClick={() => setShowReminderForm(false)}>
-                  <X className="mr-1 h-3.5 w-3.5" />
-                  {t('common.cancel')}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {reminders.length === 0 && !showReminderForm ? (
-          <p className="text-sm text-muted-foreground">{t('vehicles.noReminders')}</p>
-        ) : (
-          <div className="space-y-2">
-            {reminders.map((r) => {
-              // If editing this reminder, show inline edit form instead of the card
-              if (editingReminderId === r.id) {
-                return (
-                  <Card key={r.id}>
-                    <CardContent className="pt-4">
-                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                        <div className="space-y-1">
-                          <Label>{t('vehicles.dueDate')}</Label>
-                          <Input
-                            type="date"
-                            value={reminderDueDate}
-                            onChange={(e) => setReminderDueDate(e.target.value)}
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <Label>{t('vehicles.notifyDaysBefore')}</Label>
-                          <Input
-                            type="number"
-                            value={reminderNotifyDays}
-                            onChange={(e) => setReminderNotifyDays(e.target.value)}
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <Label>{t('vehicles.reminderNote')}</Label>
-                          <Input
-                            value={reminderNote}
-                            onChange={(e) => setReminderNote(e.target.value)}
-                          />
-                        </div>
-                      </div>
-                      <div className="flex gap-2 mt-3">
-                        <Button size="sm" onClick={saveReminder}>
-                          <Check className="mr-1 h-3.5 w-3.5" />
-                          {t('common.save')}
-                        </Button>
-                        <Button size="sm" variant="ghost" onClick={() => { setShowReminderForm(false); setEditingReminderId(null) }}>
-                          <X className="mr-1 h-3.5 w-3.5" />
-                          {t('common.cancel')}
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )
-              }
-
-              const days = daysUntil(r.due_date)
-              const isOverdue = days < 0
-              const isDueToday = days === 0
-              return (
-                <Card key={r.id} className={isOverdue ? 'border-destructive/50' : undefined}>
-                  <CardContent className="flex items-center justify-between py-3">
-                    <div className="space-y-0.5">
-                      <p className="text-sm font-medium">
-                        {new Date(r.due_date).toLocaleDateString()}
-                        {' — '}
-                        <span className={isOverdue ? 'text-destructive' : isDueToday ? 'text-primary' : 'text-muted-foreground'}>
-                          {isDueToday
-                            ? t('vehicles.dueToday')
-                            : isOverdue
-                              ? t('vehicles.daysOverdue', { count: Math.abs(days) })
-                              : t('vehicles.daysRemaining', { count: days })}
-                        </span>
-                      </p>
-                      {r.note && <p className="text-sm text-muted-foreground">{r.note}</p>}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Button variant="ghost" size="icon-sm" onClick={() => startEditReminder(r)}>
-                        <Pencil className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={() =>
-                          updateReminderMutation.mutate({
-                            id: r.id,
-                            data: { is_active: false },
-                          })
-                        }
-                        loading={updateReminderMutation.isPending}
-                        title={t('reminders.deactivate')}
-                      >
-                        <X className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              )
-            })}
-          </div>
-        )}
-      </div>
+      <VehicleRemindersSection vehicleId={id!} />
 
       {/* Photos section */}
       <div>
@@ -517,26 +279,13 @@ export default function VehicleDetailPage() {
       </div>
 
       {/* Delete confirmation dialog */}
-      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t('common.delete')}</DialogTitle>
-            <DialogDescription>{t('vehicles.deleteConfirm')}</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteOpen(false)}>
-              {t('common.cancel')}
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => deleteVehicleMutation.mutate(id!)}
-              loading={deleteVehicleMutation.isPending}
-            >
-              {t('common.delete')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteConfirmDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        onConfirm={() => deleteVehicleMutation.mutate(id!)}
+        description={t('vehicles.deleteConfirm')}
+        isPending={deleteVehicleMutation.isPending}
+      />
     </div>
   )
 }

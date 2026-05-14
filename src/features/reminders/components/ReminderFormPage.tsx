@@ -13,6 +13,7 @@ import {
   useUpdateReminderFromPage,
 } from '@/features/reminders/hooks/useReminders'
 import { PageSpinner } from '@/components/PageSpinner'
+import { DEFAULT_NOTIFY_DAYS } from '@/features/reminders/constants'
 
 function formatVehicleDisplay(v: { plate_number: string; brand: string; model: string | null; engine_capacity?: number | null; engine_designation?: string | null }) {
   let label = `${v.plate_number} — ${v.brand}${v.model ? ` ${v.model}` : ''}`
@@ -60,7 +61,7 @@ function ReminderForm({
           updates: {
             vehicle_id: vehicleId,
             due_date: dueDate,
-            notify_days_before: parseInt(notifyDays) || 10,
+            notify_days_before: parseInt(notifyDays) || DEFAULT_NOTIFY_DAYS,
             note: note || null,
           },
         },
@@ -71,7 +72,7 @@ function ReminderForm({
         {
           vehicle_id: vehicleId,
           due_date: dueDate,
-          notify_days_before: parseInt(notifyDays) || 10,
+          notify_days_before: parseInt(notifyDays) || DEFAULT_NOTIFY_DAYS,
           note: note || null,
         },
         { onSuccess: () => navigate('/reminders') }
@@ -198,7 +199,7 @@ export default function ReminderFormPage() {
         vehicleId: null,
         vehicleDisplay: undefined,
         dueDate: '',
-        notifyDays: '10',
+        notifyDays: String(DEFAULT_NOTIFY_DAYS),
         note: '',
       }}
     />

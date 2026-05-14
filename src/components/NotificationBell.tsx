@@ -15,20 +15,8 @@ import {
   useDismissNotification,
   useDismissAllNotifications,
 } from '@/features/notifications/hooks/useNotifications'
-import type { Database } from '@/types/database'
-
-type NotificationType = Database['public']['Enums']['notification_type']
-
-function typeVariant(type: NotificationType) {
-  switch (type) {
-    case 'unpaid_invoice':
-      return 'destructive' as const
-    case 'upcoming_service':
-      return 'default' as const
-    default:
-      return 'secondary' as const
-  }
-}
+import { notificationTypeVariant, NOTIFICATION_TYPE } from '@/lib/enums'
+import { SCROLL_LOAD_THRESHOLD } from '@/lib/constants'
 
 function timeAgo(dateStr: string, t: (key: string) => string): string {
   const diff = Date.now() - new Date(dateStr).getTime()
@@ -52,15 +40,15 @@ export default function NotificationBell() {
   const handleScroll = useCallback(() => {
     const el = scrollRef.current
     if (!el || !hasNextPage || isFetchingNextPage) return
-    if (el.scrollHeight - el.scrollTop - el.clientHeight < 50) {
+    if (el.scrollHeight - el.scrollTop - el.clientHeight < SCROLL_LOAD_THRESHOLD) {
       fetchNextPage()
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
   const handleClick = (notification: (typeof notifications)[number]) => {
-    if (notification.type === 'upcoming_service' && notification.reminder_id) {
+    if (notification.type === NOTIFICATION_TYPE.UPCOMING_SERVICE && notification.reminder_id) {
       navigate('/reminders')
-    } else if (notification.type === 'unpaid_invoice') {
+    } else if (notification.type === NOTIFICATION_TYPE.UNPAID_INVOICE) {
       navigate('/invoices')
     } else {
       navigate('/')
@@ -121,7 +109,7 @@ export default function NotificationBell() {
                     <span className="text-sm font-medium truncate">
                       {n.title}
                     </span>
-                    <Badge variant={typeVariant(n.type)} className="text-[10px] px-1.5 py-0 shrink-0">
+                    <Badge variant={notificationTypeVariant(n.type)} className="text-[10px] px-1.5 py-0 shrink-0">
                       {t(`notifications.${n.type}`)}
                     </Badge>
                   </div>

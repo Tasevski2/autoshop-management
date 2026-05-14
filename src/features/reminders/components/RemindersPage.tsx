@@ -15,13 +15,14 @@ import {
 } from '@/components/ui/table'
 import { useReminders, useDeactivateReminder } from '@/features/reminders/hooks/useReminders'
 import { PageSpinner } from '@/components/PageSpinner'
+import { MS_PER_DAY } from '@/lib/constants'
 
 function getDaysUntil(dueDate: string) {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   const due = new Date(dueDate)
   due.setHours(0, 0, 0, 0)
-  return Math.ceil((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+  return Math.ceil((due.getTime() - today.getTime()) / MS_PER_DAY)
 }
 
 function DueBadge({ dueDate }: { dueDate: string }) {

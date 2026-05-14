@@ -14,12 +14,13 @@ import {
   useUpdateCustomer,
 } from '@/features/customers/hooks/useCustomers'
 import { PageSpinner } from '@/components/PageSpinner'
+import { CUSTOMER_TYPE, CUSTOMER_TYPES, type CustomerType } from '@/lib/enums'
 
 const customerSchema = z.object({
   full_name: z.string().min(1),
   phone: z.string().optional().transform((v) => v || null),
   email: z.string().email().optional().or(z.literal('')).transform((v) => v || null),
-  customer_type: z.enum(['person', 'company']),
+  customer_type: z.enum([...CUSTOMER_TYPES]),
   address: z.string().optional().transform((v) => v || null),
   city: z.string().optional().transform((v) => v || null),
   tax_number: z.string().optional().transform((v) => v || null),
@@ -52,7 +53,7 @@ export default function CustomerFormPage() {
           full_name: customer.full_name,
           phone: customer.phone ?? '',
           email: customer.email ?? '',
-          customer_type: (customer.customer_type as 'person' | 'company') ?? 'person',
+          customer_type: (customer.customer_type as CustomerType) ?? CUSTOMER_TYPE.PERSON,
           address: customer.address ?? '',
           city: customer.city ?? '',
           tax_number: customer.tax_number ?? '',
@@ -62,7 +63,7 @@ export default function CustomerFormPage() {
           full_name: '',
           phone: '',
           email: '',
-          customer_type: 'person' as const,
+          customer_type: CUSTOMER_TYPE.PERSON,
           address: '',
           city: '',
           tax_number: '',
@@ -127,18 +128,18 @@ export default function CustomerFormPage() {
               <div className="flex gap-2">
                 <Button
                   type="button"
-                  variant={watch('customer_type') === 'person' ? 'default' : 'outline'}
+                  variant={watch('customer_type') === CUSTOMER_TYPE.PERSON ? 'default' : 'outline'}
                   size="sm"
-                  onClick={() => setValue('customer_type', 'person')}
+                  onClick={() => setValue('customer_type', CUSTOMER_TYPE.PERSON)}
                 >
                   <User className="mr-1.5 h-3.5 w-3.5" />
                   {t('customers.person')}
                 </Button>
                 <Button
                   type="button"
-                  variant={watch('customer_type') === 'company' ? 'default' : 'outline'}
+                  variant={watch('customer_type') === CUSTOMER_TYPE.COMPANY ? 'default' : 'outline'}
                   size="sm"
-                  onClick={() => setValue('customer_type', 'company')}
+                  onClick={() => setValue('customer_type', CUSTOMER_TYPE.COMPANY)}
                 >
                   <Building2 className="mr-1.5 h-3.5 w-3.5" />
                   {t('customers.company')}

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { Plus, Search, ChevronLeft, ChevronRight, Pencil, Trash2, Wrench, Check, X as XIcon } from 'lucide-react'
+import { DEBOUNCE_DELAY_MS } from '@/lib/constants'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -21,10 +22,8 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useServices, useUpdateServiceStatus, useDeleteService } from '@/features/services/hooks/useServices'
-import type { ServiceStatus } from '@/features/services/types'
+import { SERVICE_STATUSES, type ServiceStatus } from '@/lib/enums'
 import { PageSpinner } from '@/components/PageSpinner'
-
-const STATUSES: ServiceStatus[] = ['in_progress', 'completed', 'invoiced', 'partially_paid', 'paid', 'cancelled']
 
 function StatusSelect({ serviceId, status }: { serviceId: string; status: ServiceStatus }) {
   const { t } = useTranslation()
@@ -38,7 +37,7 @@ function StatusSelect({ serviceId, status }: { serviceId: string; status: Servic
       disabled={mutation.isPending}
       className="flex h-7 rounded-md border border-input bg-background px-2 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
-      {STATUSES.map((s) => (
+      {SERVICE_STATUSES.map((s) => (
         <option key={s} value={s}>
           {t(`services.statuses.${s}`)}
         </option>
@@ -66,7 +65,7 @@ export default function ServicesListPage() {
     timerRef.current = setTimeout(() => {
       setDebouncedSearch(search)
       setPage(0)
-    }, 300)
+    }, DEBOUNCE_DELAY_MS)
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current)
     }
@@ -118,7 +117,7 @@ export default function ServicesListPage() {
           className="flex h-8 rounded-lg border border-input bg-background px-3 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <option value="">{t('services.allStatuses')}</option>
-          {STATUSES.map((s) => (
+          {SERVICE_STATUSES.map((s) => (
             <option key={s} value={s}>
               {t(`services.statuses.${s}`)}
             </option>

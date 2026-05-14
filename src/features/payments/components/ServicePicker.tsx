@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useVehicleOptions } from '@/features/services/hooks/useServices'
 import { useVehicleServicesWithTotals } from '@/features/payments/hooks/usePayments'
+import { DEBOUNCE_DELAY_MS } from '@/lib/constants'
 
 interface ServicePickerProps {
   value: string | null
@@ -40,7 +41,7 @@ export default function ServicePicker({ value, onChange }: ServicePickerProps) {
     if (timerRef.current) clearTimeout(timerRef.current)
     timerRef.current = setTimeout(() => {
       setDebouncedSearch(search)
-    }, 300)
+    }, DEBOUNCE_DELAY_MS)
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current)
     }

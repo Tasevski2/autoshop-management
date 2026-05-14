@@ -6,10 +6,12 @@ import type {
   TableCell,
 } from "pdfmake/interfaces";
 import type {
-  InvoiceLineItem,
   InvoiceSeller,
   InvoiceBuyer,
+  InvoiceLineItem,
 } from "@/features/invoices/types";
+import { fmt, fmtDate, calcLineItem } from "@/features/invoices/invoice-utils";
+import { CUSTOMER_TYPE } from "@/lib/enums";
 
 
 // Register bundled Roboto (includes Cyrillic glyphs)
@@ -23,28 +25,6 @@ export interface InvoicePdfParams {
   buyer: InvoiceBuyer;
   lineItems: InvoiceLineItem[];
   amountInWords: string;
-}
-
-function fmt(n: number): string {
-  return n.toLocaleString("mk-MK", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-}
-
-/** Convert "2026-04-29" → "29/04/2026" */
-function fmtDate(iso: string): string {
-  const [y, m, d] = iso.split("-");
-  return `${d}/${m}/${y}`;
-}
-
-function calcLineItem(item: InvoiceLineItem) {
-  const baseTotal = item.priceWithoutTax * item.quantity;
-  const discountAmount = baseTotal * (item.discountPercent / 100);
-  const afterDiscount = baseTotal - discountAmount;
-  const vatAmount = afterDiscount * (item.vatPercent / 100);
-  const totalWithVat = afterDiscount + vatAmount;
-  return { discountAmount, afterDiscount, vatAmount, totalWithVat };
 }
 
 function buildDocDefinition(params: InvoicePdfParams): TDocumentDefinitions {
@@ -71,7 +51,7 @@ function buildDocDefinition(params: InvoicePdfParams): TDocumentDefinitions {
   }
   const totalWithVat = totalWithoutVat + totalVat;
   const taxNumberLabel =
-    buyer.customerType === "company" ? "Даночен Број" : "Даночен Број(ЕМБГ)";
+    buyer.customerType === CUSTOMER_TYPE.COMPANY ? "Даночен Број" : "Даночен Број(ЕМБГ)";
 
   // ── Seller header lines ──
   const sellerSubLines: string[] = [];

@@ -1,6 +1,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { sanitizeFilterValue } from '@/lib/utils'
+import { MIN_SEARCH_LENGTH } from '@/lib/constants'
 
 const PAGE_SIZE = 10
 
@@ -53,7 +54,7 @@ async function searchServices(query: string, page: number) {
 }
 
 export function useGlobalSearch(query: string) {
-  const enabled = query.length >= 2
+  const enabled = query.length >= MIN_SEARCH_LENGTH
 
   const customersQuery = useInfiniteQuery({
     queryKey: ['search', 'customers', query],

@@ -3,6 +3,7 @@ import { Plus, Trash2, GripVertical } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import type { InvoiceLineItem } from '@/features/invoices/types'
+import { DEFAULT_UNIT, VAT_RATES } from '@/features/invoices/constants'
 
 interface Props {
   items: InvoiceLineItem[]
@@ -21,7 +22,7 @@ export default function InvoiceLineItemsEditor({ items, onChange }: Props) {
   const addRow = () => {
     onChange([
       ...items,
-      { description: '', unit: 'ком', quantity: 1, priceWithoutTax: 0, discountPercent: 0, vatPercent: 0 },
+      { description: '', unit: DEFAULT_UNIT, quantity: 1, priceWithoutTax: 0, discountPercent: 0, vatPercent: 0 },
     ])
   }
 
@@ -120,9 +121,9 @@ export default function InvoiceLineItemsEditor({ items, onChange }: Props) {
                     onChange={(e) => updateItem(i, 'vatPercent', parseFloat(e.target.value))}
                     className="flex h-8 w-16 rounded-md border border-input bg-background px-2 text-sm"
                   >
-                    <option value={0}>0%</option>
-                    <option value={5}>5%</option>
-                    <option value={18}>18%</option>
+                    {VAT_RATES.map((rate) => (
+                      <option key={rate} value={rate}>{rate}%</option>
+                    ))}
                   </select>
                 </td>
                 <td className="p-1">

@@ -23,10 +23,12 @@ export interface InProgressService {
   } | null
 }
 
+import type { ServiceStatus } from '@/lib/enums'
+
 export interface UnpaidService {
   id: string
   service_date: string
-  status: string
+  status: ServiceStatus
   service_total: number
   total_paid: number
   balance_due: number

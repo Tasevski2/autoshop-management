@@ -22,25 +22,8 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useExpenses, useExpenseTotals, useDeleteExpense } from '@/features/expenses/hooks/useExpenses'
-import type { ExpenseCategory } from '@/features/expenses/types'
+import { EXPENSE_CATEGORIES, EXPENSE_CATEGORY_COLORS, type ExpenseCategory } from '@/lib/enums'
 import { PageSpinner } from '@/components/PageSpinner'
-
-const CATEGORIES: ExpenseCategory[] = [
-  'rent', 'utilities', 'tools', 'salary', 'supplies',
-  'maintenance', 'insurance', 'taxes', 'other',
-]
-
-const CATEGORY_COLORS: Record<ExpenseCategory, string> = {
-  rent: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-  utilities: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-  tools: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200',
-  salary: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-  supplies: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
-  maintenance: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-  insurance: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200',
-  taxes: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-  other: 'bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-200',
-}
 
 export default function ExpensesListPage() {
   const { t } = useTranslation()
@@ -91,11 +74,11 @@ export default function ExpensesListPage() {
               {t('expenses.total')}: {totals.total.toLocaleString()} ден
             </div>
             <div className="flex flex-wrap gap-2">
-              {CATEGORIES.map((cat) => {
+              {EXPENSE_CATEGORIES.map((cat) => {
                 const amount = totals.byCategory.get(cat)
                 if (!amount) return null
                 return (
-                  <Badge key={cat} className={CATEGORY_COLORS[cat]}>
+                  <Badge key={cat} className={EXPENSE_CATEGORY_COLORS[cat]}>
                     {t(`expenses.categories.${cat}`)}: {amount.toLocaleString()} ден
                   </Badge>
                 )
@@ -113,7 +96,7 @@ export default function ExpensesListPage() {
           className="flex h-8 rounded-lg border border-input bg-background px-3 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <option value="">{t('expenses.allCategories')}</option>
-          {CATEGORIES.map((c) => (
+          {EXPENSE_CATEGORIES.map((c) => (
             <option key={c} value={c}>
               {t(`expenses.categories.${c}`)}
             </option>
@@ -164,7 +147,7 @@ export default function ExpensesListPage() {
                       {new Date(exp.expense_date).toLocaleDateString()}
                     </TableCell>
                     <TableCell>
-                      <Badge className={CATEGORY_COLORS[exp.category]}>
+                      <Badge className={EXPENSE_CATEGORY_COLORS[exp.category]}>
                         {t(`expenses.categories.${exp.category}`)}
                       </Badge>
                     </TableCell>

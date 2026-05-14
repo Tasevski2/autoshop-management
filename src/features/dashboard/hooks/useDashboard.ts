@@ -5,37 +5,37 @@ import {
   fetchDueReminders,
   fetchUnpaidServices,
 } from '../api'
-
-const REFETCH_INTERVAL = 5 * 60 * 1000
+import { QUERY_KEYS } from '@/lib/query-keys'
+import { DASHBOARD_REFETCH_MS } from '@/lib/constants'
 
 export function useDashboardStats() {
   return useQuery({
-    queryKey: ['dashboard', 'stats'],
+    queryKey: QUERY_KEYS.dashboard.stats,
     queryFn: fetchDashboardStats,
-    refetchInterval: REFETCH_INTERVAL,
+    refetchInterval: DASHBOARD_REFETCH_MS,
   })
 }
 
 export function useInProgressServices() {
   return useQuery({
-    queryKey: ['dashboard', 'in-progress'],
+    queryKey: QUERY_KEYS.dashboard.inProgress,
     queryFn: fetchInProgressServices,
-    refetchInterval: REFETCH_INTERVAL,
+    refetchInterval: DASHBOARD_REFETCH_MS,
   })
 }
 
 export function useDueReminders() {
   return useQuery({
-    queryKey: ['dashboard', 'reminders'],
+    queryKey: QUERY_KEYS.dashboard.reminders,
     queryFn: fetchDueReminders,
-    refetchInterval: REFETCH_INTERVAL,
+    refetchInterval: DASHBOARD_REFETCH_MS,
   })
 }
 
 export function useUnpaidServices() {
   return useQuery({
-    queryKey: ['dashboard', 'unpaid'],
+    queryKey: QUERY_KEYS.dashboard.unpaid,
     queryFn: fetchUnpaidServices,
-    refetchInterval: REFETCH_INTERVAL,
+    refetchInterval: DASHBOARD_REFETCH_MS,
   })
 }

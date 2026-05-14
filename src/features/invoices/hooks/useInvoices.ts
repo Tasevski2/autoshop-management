@@ -12,10 +12,11 @@ import {
   fetchInvoices,
 } from '@/features/invoices/api'
 import type { InvoiceInsert } from '@/features/invoices/types'
+import { QUERY_KEYS } from '@/lib/query-keys'
 
 export function useInvoiceData(serviceId: string) {
   return useQuery({
-    queryKey: ['invoices', 'data', serviceId],
+    queryKey: QUERY_KEYS.invoices.data(serviceId),
     queryFn: () => fetchInvoiceData(serviceId),
     enabled: !!serviceId,
   })
@@ -23,7 +24,7 @@ export function useInvoiceData(serviceId: string) {
 
 export function useExistingInvoice(serviceId: string) {
   return useQuery({
-    queryKey: ['invoices', 'existing', serviceId],
+    queryKey: QUERY_KEYS.invoices.existing(serviceId),
     queryFn: () => fetchExistingInvoice(serviceId),
     enabled: !!serviceId,
   })
@@ -49,9 +50,9 @@ export function useSaveInvoice() {
       return createInvoiceRecord(invoice)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['invoices'] })
-      queryClient.invalidateQueries({ queryKey: ['services'] })
-      queryClient.invalidateQueries({ queryKey: ['user'] })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.invoices.all })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.services.all })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.user.all })
       toast.success(t('common.saved'))
     },
     onError: () => {
@@ -62,7 +63,7 @@ export function useSaveInvoice() {
 
 export function useNextInvoiceNumber(serviceId: string, hasExistingInvoice: boolean) {
   return useQuery({
-    queryKey: ['invoices', 'nextNumber', serviceId],
+    queryKey: QUERY_KEYS.invoices.nextNumber(serviceId),
     queryFn: getNextInvoiceNumber,
     enabled: !hasExistingInvoice,
     staleTime: Infinity,
@@ -76,7 +77,7 @@ export function useDeleteInvoice() {
   return useMutation({
     mutationFn: (id: string) => deleteInvoiceRecord(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.invoices.all })
     },
     onError: () => {
       toast.error(t('common.error'))
@@ -94,7 +95,7 @@ export function useInvoices({
   dateTo?: string
 } = {}) {
   return useQuery({
-    queryKey: ['invoices', 'list', { page, dateFrom, dateTo }],
+    queryKey: QUERY_KEYS.invoices.list({ page, dateFrom, dateTo }),
     queryFn: () => fetchInvoices({ page, dateFrom, dateTo }),
     placeholderData: (prev) => prev,
   })

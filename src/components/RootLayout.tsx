@@ -31,6 +31,7 @@ import { useAuth } from '@/features/auth/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
 import TopBar from '@/components/TopBar'
 import QuickActionsFab from '@/components/QuickActionsFab'
+import { LANGUAGE } from '@/lib/i18n'
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, labelKey: 'nav.dashboard' },
@@ -55,7 +56,7 @@ function SidebarContent({ onNavigate }: SidebarContentProps) {
   const { theme, toggleTheme } = useTheme()
 
   const toggleLanguage = () => {
-    const next = i18n.language === 'mk' ? 'en' : 'mk'
+    const next = i18n.language === LANGUAGE.MK ? LANGUAGE.EN : LANGUAGE.MK
     i18n.changeLanguage(next)
   }
 
@@ -92,7 +93,7 @@ function SidebarContent({ onNavigate }: SidebarContentProps) {
           className="w-full justify-start gap-2"
         >
           <Globe className="h-4 w-4" />
-          {i18n.language === 'mk' ? 'English' : 'Македонски'}
+          {i18n.language === LANGUAGE.MK ? 'English' : 'Македонски'}
         </Button>
         <Button
           variant="ghost"

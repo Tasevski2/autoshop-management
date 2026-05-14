@@ -3,10 +3,11 @@ import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { fetchUserProfile, updateUserProfile } from '@/features/settings/api'
 import type { UserProfileUpdate } from '@/features/settings/types'
+import { QUERY_KEYS } from '@/lib/query-keys'
 
 export function useUserProfile() {
   return useQuery({
-    queryKey: ['user', 'profile'],
+    queryKey: QUERY_KEYS.user.profile,
     queryFn: fetchUserProfile,
   })
 }
@@ -18,8 +19,8 @@ export function useUpdateUserProfile() {
   return useMutation({
     mutationFn: (updates: UserProfileUpdate) => updateUserProfile(updates),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user'] })
-      queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.user.all })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.invoices.all })
       toast.success(t('common.saved'))
     },
     onError: () => {

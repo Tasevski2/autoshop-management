@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/table'
 import { usePayments, useDeletePaymentFromList } from '@/features/payments/hooks/usePayments'
 import { PageSpinner } from '@/components/PageSpinner'
+import type { ServiceStatus } from '@/lib/enums'
 
 export default function PaymentsListPage() {
   const { t } = useTranslation()
@@ -103,7 +104,7 @@ export default function PaymentsListPage() {
                   const service = p.services as {
                     id: string
                     service_date: string
-                    status: string
+                    status: ServiceStatus
                     vehicles: {
                       plate_number: string
                       brand: string

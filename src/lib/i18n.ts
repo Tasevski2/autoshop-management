@@ -4,6 +4,13 @@ import { initReactI18next } from 'react-i18next'
 import en from '@/locales/en/common.json'
 import mk from '@/locales/mk/common.json'
 
+export const LANGUAGE = {
+  MK: 'mk',
+  EN: 'en',
+} as const
+
+export type Language = (typeof LANGUAGE)[keyof typeof LANGUAGE]
+
 const STORAGE_KEY = 'i18nextLng'
 
 const savedLng = localStorage.getItem(STORAGE_KEY)
@@ -12,12 +19,12 @@ i18n
   .use(initReactI18next)
   .init({
     resources: {
-      en: { common: en },
-      mk: { common: mk },
+      [LANGUAGE.EN]: { common: en },
+      [LANGUAGE.MK]: { common: mk },
     },
-    lng: savedLng || 'mk',
+    lng: savedLng || LANGUAGE.MK,
     defaultNS: 'common',
-    fallbackLng: 'mk',
+    fallbackLng: LANGUAGE.MK,
     interpolation: {
       escapeValue: false,
     },

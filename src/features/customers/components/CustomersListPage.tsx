@@ -23,6 +23,8 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { useCustomers, useDeleteCustomer } from '@/features/customers/hooks/useCustomers'
 import { PageSpinner } from '@/components/PageSpinner'
+import { CUSTOMER_TYPE } from '@/lib/enums'
+import { DEBOUNCE_DELAY_MS } from '@/lib/constants'
 
 export default function CustomersListPage() {
   const { t } = useTranslation()
@@ -40,7 +42,7 @@ export default function CustomersListPage() {
     timerRef.current = setTimeout(() => {
       setDebouncedSearch(search)
       setPage(0)
-    }, 300)
+    }, DEBOUNCE_DELAY_MS)
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current)
     }
@@ -107,12 +109,12 @@ export default function CustomersListPage() {
                       <TableCell className="font-medium">{c.full_name}</TableCell>
                       <TableCell>
                         <Badge variant="secondary" className="text-xs">
-                          {c.customer_type === 'company' ? (
+                          {c.customer_type === CUSTOMER_TYPE.COMPANY ? (
                             <Building2 className="mr-1 h-3 w-3" />
                           ) : (
                             <User className="mr-1 h-3 w-3" />
                           )}
-                          {t(`customers.${c.customer_type === 'company' ? 'company' : 'person'}`)}
+                          {t(`customers.${c.customer_type === CUSTOMER_TYPE.COMPANY ? 'company' : 'person'}`)}
                         </Badge>
                       </TableCell>
                       <TableCell>{c.phone ?? '—'}</TableCell>

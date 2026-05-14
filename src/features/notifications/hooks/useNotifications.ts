@@ -6,12 +6,11 @@ import {
   dismissNotification,
   dismissAllNotifications,
 } from '@/features/notifications/api'
-
-const NOTIFICATIONS_KEY = ['notifications', 'undismissed'] as const
+import { QUERY_KEYS } from '@/lib/query-keys'
 
 export function useNotifications() {
   const query = useInfiniteQuery({
-    queryKey: NOTIFICATIONS_KEY,
+    queryKey: QUERY_KEYS.notifications.undismissed,
     queryFn: ({ pageParam = 0 }) => fetchUndismissedNotifications({ page: pageParam }),
     initialPageParam: 0,
     getNextPageParam: (lastPage) =>
@@ -35,7 +34,7 @@ export function useDismissNotification() {
   return useMutation({
     mutationFn: dismissNotification,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notifications.all })
     },
     onError: () => { toast.error(t('common.error')) },
   })
@@ -48,7 +47,7 @@ export function useDismissAllNotifications() {
   return useMutation({
     mutationFn: dismissAllNotifications,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notifications.all })
     },
     onError: () => { toast.error(t('common.error')) },
   })

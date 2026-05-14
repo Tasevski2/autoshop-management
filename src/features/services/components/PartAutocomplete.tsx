@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Loader2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { usePartOptions } from '@/features/services/hooks/useServices'
+import { SCROLL_LOAD_THRESHOLD, DEBOUNCE_DELAY_MS } from '@/lib/constants'
 
 interface PartAutocompleteProps {
   value: string
@@ -26,7 +27,7 @@ export default function PartAutocomplete({ value, onChange, onSelect }: PartAuto
     if (timerRef.current) clearTimeout(timerRef.current)
     timerRef.current = setTimeout(() => {
       setDebouncedSearch(value)
-    }, 300)
+    }, DEBOUNCE_DELAY_MS)
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current)
     }
@@ -71,7 +72,7 @@ export default function PartAutocomplete({ value, onChange, onSelect }: PartAuto
 
   const handleDropdownScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     const el = e.currentTarget
-    if (el.scrollHeight - el.scrollTop - el.clientHeight < 50 && hasNextPage && !isFetchingNextPage) {
+    if (el.scrollHeight - el.scrollTop - el.clientHeight < SCROLL_LOAD_THRESHOLD && hasNextPage && !isFetchingNextPage) {
       fetchNextPage()
     }
   }, [fetchNextPage, hasNextPage, isFetchingNextPage])

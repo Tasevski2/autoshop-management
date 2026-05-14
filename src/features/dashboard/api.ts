@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import { toLocalDateStr } from '@/lib/dates'
 import type { DashboardStats, InProgressService, UnpaidService } from './types'
+import { SERVICE_STATUS } from '@/lib/enums'
 
 function getToday() {
   return toLocalDateStr()
@@ -13,7 +14,7 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
     supabase
       .from('services')
       .select('id', { count: 'exact', head: true })
-      .eq('status', 'in_progress'),
+      .eq('status', SERVICE_STATUS.IN_PROGRESS),
     supabase.rpc('get_total_unpaid'),
     supabase.rpc('get_today_revenue', { p_date: today }),
     supabase.rpc('get_today_expenses', { p_date: today }),
@@ -39,7 +40,7 @@ export async function fetchInProgressServices(): Promise<InProgressService[]> {
       id, service_date, notes,
       vehicles!services_vehicle_id_fkey (plate_number, brand, model, customers (full_name, phone))
     `)
-    .eq('status', 'in_progress')
+    .eq('status', SERVICE_STATUS.IN_PROGRESS)
     .order('service_date', { ascending: true })
 
   if (error) throw error

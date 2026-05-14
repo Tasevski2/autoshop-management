@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 import { Wrench, AlertCircle, TrendingUp, TrendingDown } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { useDashboardStats } from '../hooks/useDashboard'
+import { SERVICE_STATUS } from '@/lib/enums'
 
 export default function StatCards() {
   const { t } = useTranslation()
@@ -16,7 +17,7 @@ export default function StatCards() {
       icon: Wrench,
       color: 'text-blue-600 dark:text-blue-400',
       bg: 'bg-blue-50 dark:bg-blue-950',
-      to: '/services?status=in_progress',
+      to: `/services?status=${SERVICE_STATUS.IN_PROGRESS}`,
     },
     {
       label: t('dashboard.unpaid'),
@@ -25,7 +26,7 @@ export default function StatCards() {
       icon: AlertCircle,
       color: 'text-red-600 dark:text-red-400',
       bg: 'bg-red-50 dark:bg-red-950',
-      to: '/services?status=completed',
+      to: `/services?status=${SERVICE_STATUS.COMPLETED}`,
     },
     {
       label: t('dashboard.revenueToday'),

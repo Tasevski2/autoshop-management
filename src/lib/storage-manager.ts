@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
 
+const STORAGE_BUCKET = 'service-images'
 const STORAGE_LIMIT_BYTES = 900 * 1024 * 1024 // 900MB
 
 export async function ensureStorageSpace(requiredBytes: number): Promise<void> {
@@ -26,7 +27,7 @@ export async function ensureStorageSpace(requiredBytes: number): Promise<void> {
   if (toDelete.length === 0) return
 
   const { error: storageError } = await supabase.storage
-    .from('service-images')
+    .from(STORAGE_BUCKET)
     .remove(toDelete.map((d) => d.storagePath))
   if (storageError) throw storageError
 

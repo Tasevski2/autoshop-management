@@ -12,13 +12,8 @@ import {
   useCreateExpense,
   useUpdateExpense,
 } from '@/features/expenses/hooks/useExpenses'
-import type { ExpenseCategory } from '@/features/expenses/types'
+import { EXPENSE_CATEGORIES, EXPENSE_CATEGORY, type ExpenseCategory } from '@/lib/enums'
 import { PageSpinner } from '@/components/PageSpinner'
-
-const CATEGORIES: ExpenseCategory[] = [
-  'rent', 'utilities', 'tools', 'salary', 'supplies',
-  'maintenance', 'insurance', 'taxes', 'other',
-]
 
 interface FormDefaults {
   expenseDate: string
@@ -128,7 +123,7 @@ function ExpenseForm({
                 onChange={(e) => setCategory(e.target.value as ExpenseCategory)}
                 className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                {CATEGORIES.map((c) => (
+                {EXPENSE_CATEGORIES.map((c) => (
                   <option key={c} value={c}>
                     {t(`expenses.categories.${c}`)}
                   </option>
@@ -191,7 +186,7 @@ export default function ExpenseFormPage() {
       defaults={{
         expenseDate: toLocalDateStr(),
         amount: '',
-        category: 'other',
+        category: EXPENSE_CATEGORY.OTHER,
         description: '',
       }}
     />

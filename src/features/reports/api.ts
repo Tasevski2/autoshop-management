@@ -15,7 +15,9 @@ import type {
   WeekdayAverage,
   PartRankingRow,
   PartSortColumn,
+  SortDirection,
 } from './types'
+import { MK_MONTH_NAMES, MK_DAY_NAMES } from './utils'
 import { detectBucketType, getBucketLabel } from './utils'
 
 // ─── Financial Tab RPCs ──────────────────────────────────────
@@ -147,7 +149,6 @@ export async function fetchRevenueTrend(): Promise<MonthlyTrendPoint[]> {
   if (error) throw error
   if (!data || data.length === 0) return []
 
-  const monthNames = ['Јан', 'Фев', 'Мар', 'Апр', 'Мај', 'Јун', 'Јул', 'Авг', 'Сеп', 'Окт', 'Ное', 'Дек']
 
   return data.map((r) => {
     const monthKey = String(r.month)
@@ -155,7 +156,7 @@ export async function fetchRevenueTrend(): Promise<MonthlyTrendPoint[]> {
     const totalRevenue = Number(r.total_revenue)
     const distinctDays = Number(r.distinct_days)
     return {
-      label: `${monthNames[monthIdx]} ${monthKey.slice(0, 4)}`,
+      label: `${MK_MONTH_NAMES[monthIdx]} ${monthKey.slice(0, 4)}`,
       month: monthKey,
       avgRevenuePerDay: distinctDays > 0 ? Math.round(totalRevenue / distinctDays) : 0,
     }
@@ -190,7 +191,7 @@ export async function fetchCustomerRankings(params: {
   dateFrom: string
   dateTo: string
   sortColumn: CustomerSortColumn
-  sortDirection: 'asc' | 'desc'
+  sortDirection: SortDirection
   page: number
   pageSize: number
 }): Promise<{ rows: CustomerRankingRow[]; totalCount: number }> {
@@ -290,7 +291,6 @@ export async function fetchWeekdayUtilization(
   if (error) throw error
   if (!data) return []
 
-  const dayNames = ['Нед', 'Пон', 'Вто', 'Сре', 'Чет', 'Пет', 'Саб']
 
   // Return Mon–Sat first, then Sunday only if it has services
   const result: WeekdayAverage[] = []
@@ -299,7 +299,7 @@ export async function fetchWeekdayUtilization(
     const svcCount = row ? Number(row.service_count) : 0
     const occurrences = row ? Number(row.weekday_occurrences) : 0
     result.push({
-      day: dayNames[i],
+      day: MK_DAY_NAMES[i],
       dayIndex: i,
       avgServices: occurrences > 0 ? Math.round((svcCount / occurrences) * 10) / 10 : 0,
     })
@@ -309,7 +309,7 @@ export async function fetchWeekdayUtilization(
   if (sunday && Number(sunday.service_count) > 0) {
     const occurrences = Number(sunday.weekday_occurrences)
     result.push({
-      day: dayNames[0],
+      day: MK_DAY_NAMES[0],
       dayIndex: 0,
       avgServices: occurrences > 0
         ? Math.round((Number(sunday.service_count) / occurrences) * 10) / 10
@@ -326,7 +326,7 @@ export async function fetchPartRankings(params: {
   dateFrom: string
   dateTo: string
   sortColumn: PartSortColumn
-  sortDirection: 'asc' | 'desc'
+  sortDirection: SortDirection
   page: number
   pageSize: number
 }): Promise<{ rows: PartRankingRow[]; totalCount: number }> {

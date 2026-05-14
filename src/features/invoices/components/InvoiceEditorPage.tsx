@@ -17,12 +17,14 @@ import {
   useSaveInvoice,
 } from "@/features/invoices/hooks/useInvoices";
 import { downloadInvoicePdf } from "@/lib/invoice-pdf";
+import { CUSTOMER_TYPE, type CustomerType } from "@/lib/enums";
 import { numberToWordsMk } from "@/lib/number-to-words-mk";
 import type {
   InvoiceLineItem,
   InvoiceSeller,
   InvoiceBuyer,
 } from "@/features/invoices/types";
+import { DEFAULT_UNIT } from "@/features/invoices/constants";
 import { PageSpinner } from '@/components/PageSpinner'
 
 function buildInitialItems(
@@ -32,7 +34,7 @@ function buildInitialItems(
 ): InvoiceLineItem[] {
   const items: InvoiceLineItem[] = parts.map((p) => ({
     description: p.name,
-    unit: "ком",
+    unit: DEFAULT_UNIT,
     quantity: p.quantity,
     priceWithoutTax: p.sell_price,
     discountPercent: 0,
@@ -42,7 +44,7 @@ function buildInitialItems(
   if (laborCost && laborCost > 0) {
     items.push({
       description: `Работна рака за возило ${plateNumber}`,
-      unit: "ком",
+      unit: DEFAULT_UNIT,
       quantity: 1,
       priceWithoutTax: laborCost,
       discountPercent: 0,
@@ -81,7 +83,7 @@ function InvoiceEditorLoaded({
       full_name: string;
       phone: string | null;
       email: string | null;
-      customer_type: string;
+      customer_type: CustomerType;
       address: string | null;
       city: string | null;
       tax_number: string | null;
@@ -152,7 +154,7 @@ function InvoiceEditorLoaded({
 
   const buyer: InvoiceBuyer = {
     name: customer?.full_name ?? "",
-    customerType: (customer?.customer_type as "person" | "company") ?? "person",
+    customerType: (customer?.customer_type as CustomerType) ?? CUSTOMER_TYPE.PERSON,
     address: customer?.address ?? null,
     city: customer?.city ?? null,
     taxNumber: customer?.tax_number ?? null,

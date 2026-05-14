@@ -9,6 +9,7 @@ import {
   deletePayment,
 } from '@/features/payments/api'
 import type { PaymentInsert } from '@/features/payments/types'
+import { QUERY_KEYS } from '@/lib/query-keys'
 
 export function usePayments({
   page = 0,
@@ -20,7 +21,7 @@ export function usePayments({
   dateTo?: string
 } = {}) {
   return useQuery({
-    queryKey: ['payments', 'list', { page, dateFrom, dateTo }],
+    queryKey: QUERY_KEYS.payments.list({ page, dateFrom, dateTo }),
     queryFn: () => fetchPayments({ page, dateFrom, dateTo }),
     placeholderData: (prev) => prev,
   })
@@ -28,7 +29,7 @@ export function usePayments({
 
 export function useVehicleServicesWithTotals(vehicleId: string | undefined) {
   return useQuery({
-    queryKey: ['services', 'by-vehicle-with-totals', vehicleId],
+    queryKey: QUERY_KEYS.services.byVehicleWithTotals(vehicleId),
     queryFn: () => fetchVehicleServicesWithTotals(vehicleId!),
     enabled: !!vehicleId,
   })
@@ -42,13 +43,13 @@ export function useCreatePaymentFromForm() {
   return useMutation({
     mutationFn: (data: PaymentInsert) => createPayment(data),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['payments'] })
-      queryClient.invalidateQueries({ queryKey: ['payments', 'by-service', variables.service_id] })
-      queryClient.invalidateQueries({ queryKey: ['service-totals', variables.service_id] })
-      queryClient.invalidateQueries({ queryKey: ['services'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard', 'stats'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard', 'unpaid'] })
-      queryClient.invalidateQueries({ queryKey: ['reports'] })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.payments.all })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.payments.byService(variables.service_id) })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.serviceTotals.detail(variables.service_id) })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.services.all })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dashboard.stats })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dashboard.unpaid })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.reports.all })
       navigate(-1)
     },
     onError: () => { toast.error(t('common.error')) },
@@ -62,12 +63,12 @@ export function useDeletePaymentFromList() {
   return useMutation({
     mutationFn: (id: string) => deletePayment(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payments'] })
-      queryClient.invalidateQueries({ queryKey: ['services'] })
-      queryClient.invalidateQueries({ queryKey: ['service-totals'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard', 'stats'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard', 'unpaid'] })
-      queryClient.invalidateQueries({ queryKey: ['reports'] })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.payments.all })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.services.all })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.serviceTotals.all })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dashboard.stats })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dashboard.unpaid })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.reports.all })
     },
     onError: () => { toast.error(t('common.error')) },
   })

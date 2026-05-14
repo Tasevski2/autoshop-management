@@ -4,6 +4,8 @@ import type {
   InvoiceSeller,
   InvoiceBuyer,
 } from "@/features/invoices/types";
+import { fmt, fmtDate, calcLineItem } from "@/features/invoices/invoice-utils";
+import { CUSTOMER_TYPE } from "@/lib/enums";
 
 
 interface Props {
@@ -14,27 +16,6 @@ interface Props {
   buyer: InvoiceBuyer;
   lineItems: InvoiceLineItem[];
   amountInWords: string;
-}
-
-function fmt(n: number): string {
-  return n.toLocaleString("mk-MK", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-}
-
-function fmtDate(iso: string): string {
-  const [y, m, d] = iso.split("-");
-  return `${d}/${m}/${y}`;
-}
-
-function calcLineItem(item: InvoiceLineItem) {
-  const baseTotal = item.priceWithoutTax * item.quantity;
-  const discountAmount = baseTotal * (item.discountPercent / 100);
-  const afterDiscount = baseTotal - discountAmount;
-  const vatAmount = afterDiscount * (item.vatPercent / 100);
-  const totalWithVat = afterDiscount + vatAmount;
-  return { discountAmount, afterDiscount, vatAmount, totalWithVat };
 }
 
 export default function InvoicePreview({
@@ -76,7 +57,7 @@ export default function InvoicePreview({
   }, [lineItems]);
 
   const taxNumberLabel =
-    buyer.customerType === "company" ? "Даночен Број" : "Даночен Број(ЕМБГ)";
+    buyer.customerType === CUSTOMER_TYPE.COMPANY ? "Даночен Број" : "Даночен Број(ЕМБГ)";
 
   return (
     <div

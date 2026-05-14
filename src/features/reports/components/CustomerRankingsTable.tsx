@@ -7,9 +7,8 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@
 import { Button } from '@/components/ui/button'
 import { useCustomerRankings } from '../hooks/useReports'
 import { formatMoney } from '../utils'
-import type { CustomerSortColumn } from '../types'
-
-const PAGE_SIZE = 20
+import type { CustomerSortColumn, SortDirection } from '../types'
+import { PAGE_SIZE } from '@/lib/constants'
 
 const TITLE_KEYS: Record<CustomerSortColumn, string> = {
   full_name: 'reports.customers.allCustomers',
@@ -28,7 +27,7 @@ interface Props {
 export default function CustomerRankingsTable({ dateFrom, dateTo }: Props) {
   const { t } = useTranslation()
   const [sortColumn, setSortColumn] = useState<CustomerSortColumn>('total_revenue')
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
   const [page, setPage] = useState(0)
 
   // Reset page when sort or date range changes

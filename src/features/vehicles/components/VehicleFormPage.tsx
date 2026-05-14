@@ -18,9 +18,8 @@ import { useCustomer } from '@/features/customers/hooks/useCustomers'
 import CustomerPicker from './CustomerPicker'
 import BrandPicker from './BrandPicker'
 import ModelPicker from './ModelPicker'
+import { ENGINE_TYPES } from '@/lib/enums'
 import { PageSpinner } from '@/components/PageSpinner'
-
-const ENGINE_TYPES = ['petrol', 'diesel', 'hybrid', 'electric'] as const
 
 const vehicleSchema = z.object({
   plate_number: z.string().min(1),

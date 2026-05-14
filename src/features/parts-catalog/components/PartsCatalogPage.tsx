@@ -28,6 +28,7 @@ import {
 } from '@/features/parts-catalog/hooks/usePartsCatalog'
 import type { PartsCatalog, PartsCatalogInsert } from '@/features/parts-catalog/types'
 import { PageSpinner } from '@/components/PageSpinner'
+import { DEBOUNCE_DELAY_MS } from '@/lib/constants'
 
 interface PartFormData {
   name: string
@@ -72,7 +73,7 @@ export default function PartsCatalogPage() {
     const timer = setTimeout(() => {
       setDebouncedSearch(value)
       setPage(0)
-    }, 300)
+    }, DEBOUNCE_DELAY_MS)
     setSearchTimer(timer)
   }
 

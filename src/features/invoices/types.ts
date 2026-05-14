@@ -1,4 +1,5 @@
 import type { Database } from '@/types/database'
+import type { CustomerType } from '@/lib/enums'
 
 export type Invoice = Database['public']['Tables']['invoices']['Row']
 export type InvoiceInsert = Database['public']['Tables']['invoices']['Insert']
@@ -26,7 +27,7 @@ export interface InvoiceSeller {
 
 export interface InvoiceBuyer {
   name: string
-  customerType: 'person' | 'company'
+  customerType: CustomerType
   address: string | null
   city: string | null
   taxNumber: string | null

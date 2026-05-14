@@ -12,10 +12,11 @@ import {
   deleteCustomer,
 } from '@/features/customers/api'
 import type { CustomerInsert, CustomerUpdate } from '@/features/customers/types'
+import { QUERY_KEYS } from '@/lib/query-keys'
 
 export function useCustomers({ page = 0, search }: { page?: number; search?: string } = {}) {
   return useQuery({
-    queryKey: ['customers', 'list', { page, search }],
+    queryKey: QUERY_KEYS.customers.list({ page, search }),
     queryFn: () => fetchCustomers({ page, search }),
     placeholderData: (prev) => prev,
   })
@@ -23,7 +24,7 @@ export function useCustomers({ page = 0, search }: { page?: number; search?: str
 
 export function useCustomer(id: string | undefined) {
   return useQuery({
-    queryKey: ['customers', 'detail', id],
+    queryKey: QUERY_KEYS.customers.detail(id),
     queryFn: () => fetchCustomer(id!),
     enabled: !!id,
   })
@@ -31,14 +32,14 @@ export function useCustomer(id: string | undefined) {
 
 export function useCustomerVehicles(customerId: string) {
   return useQuery({
-    queryKey: ['vehicles', 'by-customer', customerId],
+    queryKey: QUERY_KEYS.vehicles.byCustomer(customerId),
     queryFn: () => fetchCustomerVehicles(customerId),
   })
 }
 
 export function useCustomerServices(customerId: string, page = 0) {
   return useQuery({
-    queryKey: ['services', 'by-customer', customerId, { page }],
+    queryKey: QUERY_KEYS.services.byCustomer(customerId, { page }),
     queryFn: () => fetchCustomerServices(customerId, { page }),
     placeholderData: (prev) => prev,
   })
@@ -52,7 +53,7 @@ export function useCreateCustomer() {
   return useMutation({
     mutationFn: (data: Omit<CustomerInsert, 'user_id'>) => createCustomer(data),
     onSuccess: (customer) => {
-      queryClient.invalidateQueries({ queryKey: ['customers'] })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.customers.all })
       navigate(`/customers/${customer.id}`)
     },
     onError: () => { toast.error(t('common.error')) },
@@ -67,8 +68,8 @@ export function useUpdateCustomer(id: string) {
   return useMutation({
     mutationFn: (data: CustomerUpdate) => updateCustomer(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customers'] })
-      queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.customers.all })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.invoices.all })
       navigate(`/customers/${id}`)
     },
     onError: () => { toast.error(t('common.error')) },
@@ -83,9 +84,9 @@ export function useDeleteCustomer() {
   return useMutation({
     mutationFn: (id: string) => deleteCustomer(id),
     onSuccess: (_data, id) => {
-      queryClient.invalidateQueries({ queryKey: ['customers'] })
-      queryClient.invalidateQueries({ queryKey: ['vehicles', 'by-customer', id] })
-      queryClient.invalidateQueries({ queryKey: ['services', 'by-customer', id] })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.customers.all })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.vehicles.byCustomer(id) })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.services.all })
       navigate('/customers')
     },
     onError: () => { toast.error(t('common.error')) },

@@ -1,5 +1,7 @@
 import type { InvoiceLineItem, InvoiceSeller, InvoiceBuyer } from '@/features/invoices/types'
+import { fmt, calcLineItem } from '@/features/invoices/invoice-utils'
 import { numberToWordsMk } from './number-to-words-mk'
+import { CUSTOMER_TYPE } from '@/lib/enums'
 
 interface InvoiceHtmlParams {
   invoiceNumber: string
@@ -8,19 +10,6 @@ interface InvoiceHtmlParams {
   seller: InvoiceSeller
   buyer: InvoiceBuyer
   lineItems: InvoiceLineItem[]
-}
-
-function fmt(n: number): string {
-  return n.toLocaleString('mk-MK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-}
-
-function calcLineItem(item: InvoiceLineItem) {
-  const baseTotal = item.priceWithoutTax * item.quantity
-  const discountAmount = baseTotal * (item.discountPercent / 100)
-  const afterDiscount = baseTotal - discountAmount
-  const vatAmount = afterDiscount * (item.vatPercent / 100)
-  const totalWithVat = afterDiscount + vatAmount
-  return { discountAmount, afterDiscount, vatAmount, totalWithVat }
 }
 
 export function generateInvoiceHtml(params: InvoiceHtmlParams): string {
@@ -44,7 +33,7 @@ export function generateInvoiceHtml(params: InvoiceHtmlParams): string {
   }
 
   const totalWithVat = totalWithoutVat + totalVat
-  const taxNumberLabel = buyer.customerType === 'company' ? 'Даночен Број' : 'Даночен Број(ЕМБГ)'
+  const taxNumberLabel = buyer.customerType === CUSTOMER_TYPE.COMPANY ? 'Даночен Број' : 'Даночен Број(ЕМБГ)'
 
   // Line items HTML
   const lineItemsHtml = lineItems

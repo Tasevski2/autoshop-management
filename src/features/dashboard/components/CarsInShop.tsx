@@ -4,13 +4,14 @@ import { Car, Phone, ChevronRight, Clock, User } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useInProgressServices } from '../hooks/useDashboard'
+import { MS_PER_DAY, DAYS_IN_SHOP_WARNING } from '@/lib/constants'
 
 function daysInShop(serviceDate: string): number {
   const start = new Date(serviceDate)
   const now = new Date()
   start.setHours(0, 0, 0, 0)
   now.setHours(0, 0, 0, 0)
-  return Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
+  return Math.floor((now.getTime() - start.getTime()) / MS_PER_DAY)
 }
 
 export default function CarsInShop() {
@@ -57,7 +58,7 @@ export default function CarsInShop() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant={days >= 3 ? 'destructive' : 'secondary'} className="shrink-0">
+                    <Badge variant={days >= DAYS_IN_SHOP_WARNING ? 'destructive' : 'secondary'} className="shrink-0">
                       <Clock className="mr-1 h-3 w-3" />
                       {days === 0
                         ? t('dashboard.today')

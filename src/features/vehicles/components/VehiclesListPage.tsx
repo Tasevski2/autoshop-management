@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/table'
 import { useVehicles, useDeleteVehicle } from '@/features/vehicles/hooks/useVehicles'
 import { PageSpinner } from '@/components/PageSpinner'
+import { DEBOUNCE_DELAY_MS } from '@/lib/constants'
 
 export default function VehiclesListPage() {
   const { t } = useTranslation()
@@ -39,7 +40,7 @@ export default function VehiclesListPage() {
     timerRef.current = setTimeout(() => {
       setDebouncedSearch(search)
       setPage(0)
-    }, 300)
+    }, DEBOUNCE_DELAY_MS)
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current)
     }

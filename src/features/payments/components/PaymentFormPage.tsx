@@ -9,9 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import ServicePicker from './ServicePicker'
 import { useCreatePaymentFromForm } from '@/features/payments/hooks/usePayments'
-import type { PaymentMethod } from '@/features/payments/types'
-
-const METHODS: PaymentMethod[] = ['cash', 'card', 'bank_transfer', 'other']
+import { PAYMENT_METHODS, PAYMENT_METHOD, type PaymentMethod } from '@/lib/enums'
 
 
 export default function PaymentFormPage() {
@@ -21,7 +19,7 @@ export default function PaymentFormPage() {
 
   const [serviceId, setServiceId] = useState<string | null>(null)
   const [amount, setAmount] = useState('')
-  const [method, setMethod] = useState<PaymentMethod>('cash')
+  const [method, setMethod] = useState<PaymentMethod>(PAYMENT_METHOD.CASH)
   const [paymentDate, setPaymentDate] = useState(toLocalDateStr())
   const [notes, setNotes] = useState('')
 
@@ -86,7 +84,7 @@ export default function PaymentFormPage() {
                   onChange={(e) => setMethod(e.target.value as PaymentMethod)}
                   className="flex h-8 w-full rounded-lg border border-input bg-background px-3 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  {METHODS.map((m) => (
+                  {PAYMENT_METHODS.map((m) => (
                     <option key={m} value={m}>
                       {t(`payments.methods.${m}`)}
                     </option>

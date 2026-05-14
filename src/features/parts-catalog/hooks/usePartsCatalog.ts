@@ -3,13 +3,14 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { fetchParts, createPart, updatePart, deletePart } from '../api'
 import type { PartsCatalogInsert, PartsCatalogUpdate } from '../types'
+import { QUERY_KEYS } from '@/lib/query-keys'
 
 export function useParts(params: {
   page?: number
   search?: string
 }) {
   return useQuery({
-    queryKey: ['parts-catalog', 'list', params],
+    queryKey: QUERY_KEYS.partsCatalog.list(params),
     queryFn: () => fetchParts(params),
     placeholderData: keepPreviousData,
   })
@@ -21,8 +22,8 @@ export function useCreatePart() {
   return useMutation({
     mutationFn: (part: PartsCatalogInsert) => createPart(part),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['parts-catalog'] })
-      qc.invalidateQueries({ queryKey: ['parts', 'options'] })
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.partsCatalog.all })
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.parts.options })
     },
     onError: () => { toast.error(t('common.error')) },
   })
@@ -35,8 +36,8 @@ export function useUpdatePart() {
     mutationFn: ({ id, updates }: { id: string; updates: PartsCatalogUpdate }) =>
       updatePart(id, updates),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['parts-catalog'] })
-      qc.invalidateQueries({ queryKey: ['parts', 'options'] })
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.partsCatalog.all })
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.parts.options })
     },
     onError: () => { toast.error(t('common.error')) },
   })
@@ -48,8 +49,8 @@ export function useDeletePart() {
   return useMutation({
     mutationFn: (id: string) => deletePart(id),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['parts-catalog'] })
-      qc.invalidateQueries({ queryKey: ['parts', 'options'] })
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.partsCatalog.all })
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.parts.options })
     },
     onError: () => { toast.error(t('common.error')) },
   })

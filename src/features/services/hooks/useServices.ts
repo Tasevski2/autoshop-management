@@ -23,6 +23,8 @@ import {
   upsertCatalogParts,
 } from '@/features/services/api'
 import type { ServiceInsert, ServiceUpdate, ServicePartInsert, ServiceStatus, PaymentInsert } from '@/features/services/types'
+import { QUERY_KEYS } from '@/lib/query-keys'
+import { MIN_SEARCH_LENGTH } from '@/lib/constants'
 
 export function useServices({
   page = 0,
@@ -38,7 +40,7 @@ export function useServices({
   dateTo?: string
 } = {}) {
   return useQuery({
-    queryKey: ['services', 'list', { page, search, status, dateFrom, dateTo }],
+    queryKey: QUERY_KEYS.services.list({ page, search, status, dateFrom, dateTo }),
     queryFn: () => fetchServices({ page, search, status, dateFrom, dateTo }),
     placeholderData: (prev) => prev,
   })
@@ -46,7 +48,7 @@ export function useServices({
 
 export function useService(id: string | undefined) {
   return useQuery({
-    queryKey: ['services', 'detail', id],
+    queryKey: QUERY_KEYS.services.detail(id),
     queryFn: () => fetchService(id!),
     enabled: !!id,
   })
@@ -54,7 +56,7 @@ export function useService(id: string | undefined) {
 
 export function useServiceParts(serviceId: string | undefined) {
   return useQuery({
-    queryKey: ['service-parts', 'by-service', serviceId],
+    queryKey: QUERY_KEYS.serviceParts.byService(serviceId!),
     queryFn: () => fetchServiceParts(serviceId!),
     enabled: !!serviceId,
   })
@@ -62,7 +64,7 @@ export function useServiceParts(serviceId: string | undefined) {
 
 export function useServiceTotals(serviceId: string | undefined) {
   return useQuery({
-    queryKey: ['service-totals', serviceId],
+    queryKey: QUERY_KEYS.serviceTotals.detail(serviceId!),
     queryFn: () => fetchServiceTotals(serviceId!),
     enabled: !!serviceId,
   })
@@ -70,7 +72,7 @@ export function useServiceTotals(serviceId: string | undefined) {
 
 export function useServiceImages(serviceId: string | undefined) {
   return useQuery({
-    queryKey: ['service-images', 'by-service', serviceId],
+    queryKey: QUERY_KEYS.serviceImages.byService(serviceId!),
     queryFn: () => fetchServiceImages(serviceId!),
     enabled: !!serviceId,
   })
@@ -99,12 +101,12 @@ export function useCreateService() {
       return { created, parts }
     },
     onSuccess: ({ created, parts }) => {
-      queryClient.invalidateQueries({ queryKey: ['services'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard', 'in-progress'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard', 'stats'] })
-      queryClient.invalidateQueries({ queryKey: ['reports'] })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.services.all })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dashboard.inProgress })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dashboard.stats })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.reports.all })
       upsertCatalogParts(parts).then(() => {
-        queryClient.invalidateQueries({ queryKey: ['parts'] })
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.parts.all })
       })
       navigate(`/services/${created.id}`)
     },
@@ -132,16 +134,16 @@ export function useUpdateService(id: string) {
       return { updated, parts }
     },
     onSuccess: ({ parts }) => {
-      queryClient.invalidateQueries({ queryKey: ['services'] })
-      queryClient.invalidateQueries({ queryKey: ['service-parts', 'by-service', id] })
-      queryClient.invalidateQueries({ queryKey: ['service-totals', id] })
-      queryClient.invalidateQueries({ queryKey: ['invoices'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard', 'in-progress'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard', 'stats'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard', 'unpaid'] })
-      queryClient.invalidateQueries({ queryKey: ['reports'] })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.services.all })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.serviceParts.byService(id) })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.serviceTotals.detail(id) })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.invoices.all })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dashboard.inProgress })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dashboard.stats })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dashboard.unpaid })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.reports.all })
       upsertCatalogParts(parts).then(() => {
-        queryClient.invalidateQueries({ queryKey: ['parts'] })
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.parts.all })
       })
       navigate(`/services/${id}`)
     },
@@ -156,13 +158,13 @@ export function useUpdateServiceStatus(id: string) {
   return useMutation({
     mutationFn: (status: ServiceStatus) => updateService(id, { status }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['services'] })
-      queryClient.invalidateQueries({ queryKey: ['services', 'detail', id] })
-      queryClient.invalidateQueries({ queryKey: ['invoices'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard', 'in-progress'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard', 'stats'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard', 'unpaid'] })
-      queryClient.invalidateQueries({ queryKey: ['reports'] })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.services.all })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.services.detail(id) })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.invoices.all })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dashboard.inProgress })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dashboard.stats })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dashboard.unpaid })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.reports.all })
     },
     onError: () => { toast.error(t('common.error')) },
   })
@@ -176,16 +178,16 @@ export function useDeleteService() {
   return useMutation({
     mutationFn: (id: string) => deleteService(id),
     onSuccess: (_data, id) => {
-      queryClient.invalidateQueries({ queryKey: ['services'] })
-      queryClient.invalidateQueries({ queryKey: ['service-parts', 'by-service', id] })
-      queryClient.invalidateQueries({ queryKey: ['service-images', 'by-service', id] })
-      queryClient.invalidateQueries({ queryKey: ['payments', 'by-service', id] })
-      queryClient.invalidateQueries({ queryKey: ['service-totals', id] })
-      queryClient.invalidateQueries({ queryKey: ['invoices'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard', 'in-progress'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard', 'stats'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard', 'unpaid'] })
-      queryClient.invalidateQueries({ queryKey: ['reports'] })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.services.all })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.serviceParts.byService(id) })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.serviceImages.byService(id) })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.payments.byService(id) })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.serviceTotals.detail(id) })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.invoices.all })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dashboard.inProgress })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dashboard.stats })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dashboard.unpaid })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.reports.all })
       navigate('/services')
     },
     onError: () => { toast.error(t('common.error')) },
@@ -199,7 +201,7 @@ export function useUploadServiceImage(serviceId: string) {
   return useMutation({
     mutationFn: (file: File) => uploadServiceImage(serviceId, file),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['service-images', 'by-service', serviceId] })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.serviceImages.byService(serviceId) })
     },
     onError: () => { toast.error(t('common.error')) },
   })
@@ -213,7 +215,7 @@ export function useDeleteServiceImage(serviceId: string) {
     mutationFn: ({ id, storagePath }: { id: string; storagePath: string }) =>
       deleteServiceImage(id, storagePath),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['service-images', 'by-service', serviceId] })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.serviceImages.byService(serviceId) })
     },
     onError: () => { toast.error(t('common.error')) },
   })
@@ -221,7 +223,7 @@ export function useDeleteServiceImage(serviceId: string) {
 
 export function useServicePayments(serviceId: string | undefined) {
   return useQuery({
-    queryKey: ['payments', 'by-service', serviceId],
+    queryKey: QUERY_KEYS.payments.byService(serviceId!),
     queryFn: () => fetchServicePayments(serviceId!),
     enabled: !!serviceId,
   })
@@ -234,13 +236,13 @@ export function useCreatePayment(serviceId: string) {
   return useMutation({
     mutationFn: (data: PaymentInsert) => createPayment(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payments', 'by-service', serviceId] })
-      queryClient.invalidateQueries({ queryKey: ['payments', 'list'] })
-      queryClient.invalidateQueries({ queryKey: ['service-totals', serviceId] })
-      queryClient.invalidateQueries({ queryKey: ['services'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard', 'stats'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard', 'unpaid'] })
-      queryClient.invalidateQueries({ queryKey: ['reports'] })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.payments.byService(serviceId) })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.payments.all })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.serviceTotals.detail(serviceId) })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.services.all })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dashboard.stats })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dashboard.unpaid })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.reports.all })
     },
     onError: () => { toast.error(t('common.error')) },
   })
@@ -253,13 +255,13 @@ export function useDeletePayment(serviceId: string) {
   return useMutation({
     mutationFn: (id: string) => deletePayment(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payments', 'by-service', serviceId] })
-      queryClient.invalidateQueries({ queryKey: ['payments', 'list'] })
-      queryClient.invalidateQueries({ queryKey: ['service-totals', serviceId] })
-      queryClient.invalidateQueries({ queryKey: ['services'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard', 'stats'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard', 'unpaid'] })
-      queryClient.invalidateQueries({ queryKey: ['reports'] })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.payments.byService(serviceId) })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.payments.all })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.serviceTotals.detail(serviceId) })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.services.all })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dashboard.stats })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dashboard.unpaid })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.reports.all })
     },
     onError: () => { toast.error(t('common.error')) },
   })
@@ -267,15 +269,15 @@ export function useDeletePayment(serviceId: string) {
 
 export function useVehicleOptions(search: string) {
   return useQuery({
-    queryKey: ['vehicles', 'options', search],
+    queryKey: QUERY_KEYS.vehicles.options(search),
     queryFn: () => fetchVehicleOptions(search),
-    enabled: search.length >= 2,
+    enabled: search.length >= MIN_SEARCH_LENGTH,
   })
 }
 
 export function usePartOptions(search: string) {
   const query = useInfiniteQuery({
-    queryKey: ['parts', 'options', search],
+    queryKey: [...QUERY_KEYS.parts.options, search],
     queryFn: ({ pageParam }) => fetchPartOptions(search, pageParam),
     initialPageParam: 0,
     getNextPageParam: (last) => (last.page < last.totalPages - 1 ? last.page + 1 : undefined),

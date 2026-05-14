@@ -1,5 +1,7 @@
 import imageCompression from "browser-image-compression";
 
+const SKIP_BELOW_BYTES = 1024 * 1024; // 1MB — skip compression for small files
+
 const COMPRESSION_OPTIONS = {
   maxSizeMB: 2,
   maxWidthOrHeight: 1920,
@@ -9,7 +11,7 @@ const COMPRESSION_OPTIONS = {
 
 export async function compressImage(file: File): Promise<File> {
   if (!file.type.startsWith("image/")) return file;
-  if (file.size <= 1024 * 1024) return file;
+  if (file.size <= SKIP_BELOW_BYTES) return file;
 
   try {
     const compressed = await imageCompression(file, COMPRESSION_OPTIONS);

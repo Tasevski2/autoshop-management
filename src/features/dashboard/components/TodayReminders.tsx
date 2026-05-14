@@ -4,13 +4,14 @@ import { Bell, Phone } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useDueReminders } from '../hooks/useDashboard'
+import { MS_PER_DAY } from '@/lib/constants'
 
 function daysOverdue(dueDate: string): number {
   const due = new Date(dueDate)
   const now = new Date()
   due.setHours(0, 0, 0, 0)
   now.setHours(0, 0, 0, 0)
-  return Math.floor((now.getTime() - due.getTime()) / (1000 * 60 * 60 * 24))
+  return Math.floor((now.getTime() - due.getTime()) / MS_PER_DAY)
 }
 
 export default function TodayReminders() {

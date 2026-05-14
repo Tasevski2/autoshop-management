@@ -51,20 +51,21 @@ export function detectBucketType(dateFrom: string, dateTo: string): TimeBucketTy
   return 'monthly'
 }
 
+export const MK_DAY_NAMES = ['Нед', 'Пон', 'Вто', 'Сре', 'Чет', 'Пет', 'Саб'] as const
+export const MK_MONTH_NAMES = ['Јан', 'Фев', 'Мар', 'Апр', 'Мај', 'Јун', 'Јул', 'Авг', 'Сеп', 'Окт', 'Ное', 'Дек'] as const
+
 export function getBucketLabel(key: string, bucketType: TimeBucketType): string {
-  const dayNamesShort = ['Нед', 'Пон', 'Вто', 'Сре', 'Чет', 'Пет', 'Саб']
-  const monthNames = ['Јан', 'Фев', 'Мар', 'Апр', 'Мај', 'Јун', 'Јул', 'Авг', 'Сеп', 'Окт', 'Ное', 'Дек']
 
   switch (bucketType) {
     case 'daily': {
       const d = new Date(key)
-      return `${dayNamesShort[d.getDay()]} ${key.slice(8, 10)}.${key.slice(5, 7)}`
+      return `${MK_DAY_NAMES[d.getDay()]} ${key.slice(8, 10)}.${key.slice(5, 7)}`
     }
     case 'weekly':
       return `${key.slice(8, 10)}.${key.slice(5, 7)}`
     case 'monthly': {
       const monthIdx = parseInt(key.slice(5, 7), 10) - 1
-      return monthNames[monthIdx]
+      return MK_MONTH_NAMES[monthIdx]
     }
   }
 }
