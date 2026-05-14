@@ -16,7 +16,7 @@ import {
   useNextInvoiceNumber,
   useSaveInvoice,
 } from "@/features/invoices/hooks/useInvoices";
-import { downloadInvoicePdf } from "@/lib/invoice-pdf";
+
 import { CUSTOMER_TYPE, type CustomerType } from "@/lib/enums";
 import { numberToWordsMk } from "@/lib/number-to-words-mk";
 import type {
@@ -179,7 +179,8 @@ function InvoiceEditorLoaded({
 
   const handleGenerate = useCallback(() => {
     saveMutation.mutate(invoicePayload, {
-      onSuccess: () => {
+      onSuccess: async () => {
+        const { downloadInvoicePdf } = await import("@/lib/invoice-pdf");
         downloadInvoicePdf({
           invoiceNumber,
           invoiceDate,
