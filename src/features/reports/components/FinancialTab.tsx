@@ -109,7 +109,7 @@ export default function FinancialTab({ dateFrom, dateTo }: Props) {
         ))}
       </div>
 
-      <RevenueChart data={revenueByTime ?? []} />
+      <RevenueChart data={revenueByTime ?? []} dateFrom={dateFrom} dateTo={dateTo} />
 
       <ExpensesPaymentsRow
         expenses={expensesByCategory ?? []}
@@ -119,9 +119,9 @@ export default function FinancialTab({ dateFrom, dateTo }: Props) {
         uncollected={summary.uncollected}
       />
 
-      <RevenueTrendChart />
+      <RevenueTrendChart dateFrom={dateFrom} dateTo={dateTo} />
 
-      <DailyBreakdownTable data={dailyBreakdown ?? []} />
+      <DailyBreakdownTable data={dailyBreakdown ?? []} dateFrom={dateFrom} dateTo={dateTo} />
     </div>
   )
 }

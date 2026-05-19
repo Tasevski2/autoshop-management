@@ -4,18 +4,24 @@ import { ArrowUpDown } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
 import type { DailyBreakdownRow, SortDirection } from '../types'
-import { formatMoney } from '../utils'
+import { formatMoney, detectBucketType, getBucketLabel } from '../utils'
 
 interface Props {
   data: DailyBreakdownRow[]
+  dateFrom: string
+  dateTo: string
 }
 
 type SortField = 'date' | 'serviceCount' | 'revenue' | 'partsCost' | 'operatingExpenses' | 'net' | 'collected'
 
-export default function DailyBreakdownTable({ data }: Props) {
+export default function DailyBreakdownTable({ data, dateFrom, dateTo }: Props) {
   const { t } = useTranslation()
   const [sortField, setSortField] = useState<SortField>('date')
   const [sortDir, setSortDir] = useState<SortDirection>('desc')
+
+  const dayNames = t('reports.financial.dayShort', { returnObjects: true }) as string[]
+  const monthNames = t('reports.financial.monthShort', { returnObjects: true }) as string[]
+  const bucketType = detectBucketType(dateFrom, dateTo)
 
   const sorted = useMemo(() => {
     return [...data].sort((a, b) => {
@@ -73,7 +79,7 @@ export default function DailyBreakdownTable({ data }: Props) {
             <TableBody>
               {sorted.map((row) => (
                 <TableRow key={row.date}>
-                  <TableCell className="whitespace-nowrap">{row.label}</TableCell>
+                  <TableCell className="whitespace-nowrap">{getBucketLabel(row.date, bucketType, dayNames, monthNames)}</TableCell>
                   <TableCell>{row.serviceCount}</TableCell>
                   <TableCell className="whitespace-nowrap">{formatMoney(row.revenue)}</TableCell>
                   <TableCell className="whitespace-nowrap">{formatMoney(row.partsCost)}</TableCell>

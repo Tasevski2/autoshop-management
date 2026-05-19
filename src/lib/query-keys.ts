@@ -87,7 +87,8 @@ export const QUERY_KEYS = {
       ['reports', 'payments-by-method', dateFrom, dateTo] as const,
     dailyBreakdown: (dateFrom: string, dateTo: string) =>
       ['reports', 'daily-breakdown', dateFrom, dateTo] as const,
-    trend: ['reports', 'trend'] as const,
+    weekdayRevenue: (dateFrom: string, dateTo: string) =>
+      ['reports', 'weekday-revenue', dateFrom, dateTo] as const,
     customerSummary: (dateFrom: string, dateTo: string) =>
       ['reports', 'customer-summary', dateFrom, dateTo] as const,
     customerRankings: (dateFrom: string, dateTo: string, sortColumn: string, sortDirection: string, page: number, pageSize: number) =>

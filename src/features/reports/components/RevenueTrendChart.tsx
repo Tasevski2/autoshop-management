@@ -1,24 +1,25 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
-import { useRevenueTrend } from '../hooks/useReports'
-import { linearRegression, formatMoney } from '../utils'
-import { tooltipStyle } from '../chart-config'
+import { useWeekdayRevenue } from '../hooks/useReports'
+import { formatMoney } from '../utils'
+import { tooltipStyle, cursorStyle } from '../chart-config'
 
-export default function RevenueTrendChart() {
+interface Props {
+  dateFrom: string
+  dateTo: string
+}
+
+export default function RevenueTrendChart({ dateFrom, dateTo }: Props) {
   const { t } = useTranslation()
-  const { data: points, isLoading } = useRevenueTrend()
+  const { data: rawData, isLoading } = useWeekdayRevenue(dateFrom, dateTo)
 
-  const trendData = useMemo(() => {
-    if (!points || points.length < 2) return null
-
-    const { slope, intercept } = linearRegression(points)
-    return points.map((p, i) => ({
-      ...p,
-      trend: Math.round(intercept + slope * i),
-    }))
-  }, [points])
+  const data = useMemo(() => {
+    if (!rawData) return null
+    const dayNames = t('reports.financial.dayShort', { returnObjects: true }) as string[]
+    return rawData.map((d) => ({ ...d, day: dayNames[d.dayIndex] }))
+  }, [rawData, t])
 
   if (isLoading) {
     return (
@@ -33,7 +34,7 @@ export default function RevenueTrendChart() {
     )
   }
 
-  if (!trendData || trendData.length === 0) return null
+  if (!data || data.length === 0) return null
 
   return (
     <Card>
@@ -43,32 +44,19 @@ export default function RevenueTrendChart() {
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={280}>
-          <LineChart data={trendData}>
-            <XAxis dataKey="label" tick={{ fontSize: 11 }} />
+          <BarChart data={data}>
+            <XAxis dataKey="day" tick={{ fontSize: 12 }} />
             <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => formatMoney(v)} />
             <Tooltip
               {...tooltipStyle}
-              formatter={(value, name) => [
+              cursor={cursorStyle}
+              formatter={(value) => [
                 `${formatMoney(Number(value))} ден.`,
-                name === 'avgRevenuePerDay' ? t('reports.financial.avgPerDay') : t('reports.financial.trend'),
+                t('reports.financial.avgPerDay'),
               ]}
             />
-            <Line
-              type="monotone"
-              dataKey="avgRevenuePerDay"
-              stroke="var(--chart-1)"
-              strokeWidth={2}
-              dot={{ r: 4 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="trend"
-              stroke="var(--muted-foreground)"
-              strokeWidth={1}
-              strokeDasharray="5 5"
-              dot={false}
-            />
-          </LineChart>
+            <Bar dataKey="avgRevenue" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
+          </BarChart>
         </ResponsiveContainer>
       </CardContent>
     </Card>

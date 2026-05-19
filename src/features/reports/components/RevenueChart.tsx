@@ -1,18 +1,28 @@
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import type { TimeBucketRevenue } from '../types'
-import { formatMoney } from '../utils'
+import { formatMoney, detectBucketType, getBucketLabel } from '../utils'
 import { tooltipStyle, cursorStyle } from '../chart-config'
 
 interface Props {
   data: TimeBucketRevenue[]
+  dateFrom: string
+  dateTo: string
 }
 
-export default function RevenueChart({ data }: Props) {
+export default function RevenueChart({ data, dateFrom, dateTo }: Props) {
   const { t } = useTranslation()
 
-  if (data.length === 0) return null
+  const chartData = useMemo(() => {
+    const dayNames = t('reports.financial.dayShort', { returnObjects: true }) as string[]
+    const monthNames = t('reports.financial.monthShort', { returnObjects: true }) as string[]
+    const bucketType = detectBucketType(dateFrom, dateTo)
+    return data.map((d) => ({ ...d, label: getBucketLabel(d.date, bucketType, dayNames, monthNames) }))
+  }, [data, dateFrom, dateTo, t])
+
+  if (chartData.length === 0) return null
 
   return (
     <Card>
@@ -21,7 +31,7 @@ export default function RevenueChart({ data }: Props) {
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={data}>
+          <BarChart data={chartData}>
             <XAxis dataKey="label" tick={{ fontSize: 12 }} />
             <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => formatMoney(v)} />
             <Tooltip

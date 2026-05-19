@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
@@ -11,7 +12,12 @@ interface Props {
 export default function WeekdayChart({ data }: Props) {
   const { t } = useTranslation()
 
-  if (data.length === 0) return null
+  const chartData = useMemo(() => {
+    const dayNames = t('reports.financial.dayShort', { returnObjects: true }) as string[]
+    return data.map((d) => ({ ...d, day: dayNames[d.dayIndex] }))
+  }, [data, t])
+
+  if (chartData.length === 0) return null
 
   return (
     <Card>
@@ -20,7 +26,7 @@ export default function WeekdayChart({ data }: Props) {
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={250}>
-          <BarChart data={data}>
+          <BarChart data={chartData}>
             <XAxis dataKey="day" tick={{ fontSize: 12 }} />
             <YAxis tick={{ fontSize: 12 }} />
             <Tooltip

@@ -1,5 +1,5 @@
 import { format, startOfWeek, startOfMonth, startOfYear, differenceInCalendarDays } from 'date-fns'
-import type { TimeBucketType, MonthlyTrendPoint } from './types'
+import type { TimeBucketType } from './types'
 
 // ─── Number Formatting ────────────────────────────────────────
 export function formatMoney(n: number): string {
@@ -51,41 +51,22 @@ export function detectBucketType(dateFrom: string, dateTo: string): TimeBucketTy
   return 'monthly'
 }
 
-export const MK_DAY_NAMES = ['Нед', 'Пон', 'Вто', 'Сре', 'Чет', 'Пет', 'Саб'] as const
-export const MK_MONTH_NAMES = ['Јан', 'Фев', 'Мар', 'Апр', 'Мај', 'Јун', 'Јул', 'Авг', 'Сеп', 'Окт', 'Ное', 'Дек'] as const
-
-export function getBucketLabel(key: string, bucketType: TimeBucketType): string {
-
+export function getBucketLabel(
+  key: string,
+  bucketType: TimeBucketType,
+  dayNames: string[],
+  monthNames: string[]
+): string {
   switch (bucketType) {
     case 'daily': {
       const d = new Date(key)
-      return `${MK_DAY_NAMES[d.getDay()]} ${key.slice(8, 10)}.${key.slice(5, 7)}`
+      return `${dayNames[d.getDay()]} ${key.slice(8, 10)}.${key.slice(5, 7)}`
     }
     case 'weekly':
       return `${key.slice(8, 10)}.${key.slice(5, 7)}`
     case 'monthly': {
       const monthIdx = parseInt(key.slice(5, 7), 10) - 1
-      return MK_MONTH_NAMES[monthIdx]
+      return monthNames[monthIdx]
     }
   }
-}
-
-// ─── Linear Regression ────────────────────────────────────────
-
-export function linearRegression(points: MonthlyTrendPoint[]): { slope: number; intercept: number } {
-  const n = points.length
-  if (n < 2) return { slope: 0, intercept: points[0]?.avgRevenuePerDay ?? 0 }
-
-  let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0
-  for (let i = 0; i < n; i++) {
-    sumX += i
-    sumY += points[i].avgRevenuePerDay
-    sumXY += i * points[i].avgRevenuePerDay
-    sumXX += i * i
-  }
-
-  const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX)
-  const intercept = (sumY - slope * sumX) / n
-
-  return { slope, intercept }
 }

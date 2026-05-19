@@ -77,7 +77,7 @@ export default function ServicePhotosSection({ serviceId }: ServicePhotosSection
               <button
                 type="button"
                 onClick={() => setDeleteTarget({ id: img.id, storagePath: img.storage_path })}
-                className="absolute top-1 right-1 cursor-pointer rounded-full bg-destructive/80 p-1 text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute top-1 right-1 cursor-pointer rounded-full bg-destructive/80 p-1 text-white opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 <Trash2 className="h-3 w-3" />
               </button>

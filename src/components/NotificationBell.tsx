@@ -1,59 +1,71 @@
-import { useCallback, useRef } from 'react'
-import { useNavigate } from 'react-router'
-import { useTranslation } from 'react-i18next'
-import { Bell, X, Loader2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
+import { useCallback, useRef } from "react";
+import { useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
+import { Bell, X, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover'
+} from "@/components/ui/popover";
 import {
   useNotifications,
   useDismissNotification,
   useDismissAllNotifications,
-} from '@/features/notifications/hooks/useNotifications'
-import { notificationTypeVariant, NOTIFICATION_TYPE } from '@/lib/enums'
-import { SCROLL_LOAD_THRESHOLD } from '@/lib/constants'
+} from "@/features/notifications/hooks/useNotifications";
+import { notificationTypeVariant, NOTIFICATION_TYPE } from "@/lib/enums";
+import { SCROLL_LOAD_THRESHOLD } from "@/lib/constants";
 
 function timeAgo(dateStr: string, t: (key: string) => string): string {
-  const diff = Date.now() - new Date(dateStr).getTime()
-  const minutes = Math.floor(diff / 60000)
-  if (minutes < 1) return t('notifications.justNow')
-  if (minutes < 60) return `${minutes}m`
-  const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours}h`
-  const days = Math.floor(hours / 24)
-  return `${days}d`
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 1) return t("notifications.justNow");
+  if (minutes < 60) return `${minutes}m`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h`;
+  const days = Math.floor(hours / 24);
+  return `${days}d`;
 }
 
 export default function NotificationBell() {
-  const { t } = useTranslation()
-  const navigate = useNavigate()
-  const { notifications, totalCount, fetchNextPage, hasNextPage, isFetchingNextPage } = useNotifications()
-  const dismiss = useDismissNotification()
-  const dismissAll = useDismissAllNotifications()
-  const scrollRef = useRef<HTMLDivElement>(null)
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const {
+    notifications,
+    totalCount,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useNotifications();
+  const dismiss = useDismissNotification();
+  const dismissAll = useDismissAllNotifications();
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const handleScroll = useCallback(() => {
-    const el = scrollRef.current
-    if (!el || !hasNextPage || isFetchingNextPage) return
-    if (el.scrollHeight - el.scrollTop - el.clientHeight < SCROLL_LOAD_THRESHOLD) {
-      fetchNextPage()
+    const el = scrollRef.current;
+    if (!el || !hasNextPage || isFetchingNextPage) return;
+    if (
+      el.scrollHeight - el.scrollTop - el.clientHeight <
+      SCROLL_LOAD_THRESHOLD
+    ) {
+      fetchNextPage();
     }
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleClick = (notification: (typeof notifications)[number]) => {
-    if (notification.type === NOTIFICATION_TYPE.UPCOMING_SERVICE && notification.reminder_id) {
-      navigate('/reminders')
+    if (
+      notification.type === NOTIFICATION_TYPE.UPCOMING_SERVICE &&
+      notification.reminder_id
+    ) {
+      navigate("/reminders");
     } else if (notification.type === NOTIFICATION_TYPE.UNPAID_INVOICE) {
-      navigate('/invoices')
+      navigate("/invoices");
     } else {
-      navigate('/')
+      navigate("/");
     }
-  }
+  };
 
   return (
     <Popover>
@@ -62,8 +74,8 @@ export default function NotificationBell() {
           <Button variant="ghost" size="icon-sm" className="relative">
             <Bell className="h-5 w-5" />
             {totalCount > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
-                {totalCount > 99 ? '99+' : totalCount}
+              <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-white">
+                {totalCount > 99 ? "99+" : totalCount}
               </span>
             )}
           </Button>
@@ -71,7 +83,7 @@ export default function NotificationBell() {
       />
       <PopoverContent align="end" sideOffset={8} className="w-80 p-0">
         <div className="flex items-center justify-between px-4 py-3">
-          <h3 className="text-sm font-semibold">{t('notifications.title')}</h3>
+          <h3 className="text-sm font-semibold">{t("notifications.title")}</h3>
           {totalCount > 0 && (
             <Button
               variant="ghost"
@@ -79,7 +91,7 @@ export default function NotificationBell() {
               className="h-auto px-2 py-1 text-xs text-muted-foreground"
               onClick={() => dismissAll.mutate()}
             >
-              {t('notifications.dismissAll')}
+              {t("notifications.dismissAll")}
             </Button>
           )}
         </div>
@@ -88,7 +100,7 @@ export default function NotificationBell() {
 
         {totalCount === 0 ? (
           <p className="px-4 py-8 text-center text-sm text-muted-foreground">
-            {t('notifications.empty')}
+            {t("notifications.empty")}
           </p>
         ) : (
           <div
@@ -109,7 +121,10 @@ export default function NotificationBell() {
                     <span className="text-sm font-medium truncate">
                       {n.title}
                     </span>
-                    <Badge variant={notificationTypeVariant(n.type)} className="text-[10px] px-1.5 py-0 shrink-0">
+                    <Badge
+                      variant={notificationTypeVariant(n.type)}
+                      className="text-[10px] px-1.5 py-0 shrink-0"
+                    >
                       {t(`notifications.${n.type}`)}
                     </Badge>
                   </div>
@@ -127,8 +142,8 @@ export default function NotificationBell() {
                   size="icon-sm"
                   className="shrink-0 h-6 w-6 text-muted-foreground hover:text-foreground"
                   onClick={(e) => {
-                    e.stopPropagation()
-                    dismiss.mutate(n.id)
+                    e.stopPropagation();
+                    dismiss.mutate(n.id);
                   }}
                 >
                   <X className="h-3.5 w-3.5" />
@@ -144,5 +159,5 @@ export default function NotificationBell() {
         )}
       </PopoverContent>
     </Popover>
-  )
+  );
 }

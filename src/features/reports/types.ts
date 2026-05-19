@@ -41,10 +41,10 @@ export interface DailyBreakdownRow {
   collected: number
 }
 
-export interface MonthlyTrendPoint {
-  label: string
-  month: string
-  avgRevenuePerDay: number
+export interface WeekdayRevenue {
+  day: string
+  dayIndex: number
+  avgRevenue: number
 }
 
 export interface CustomerSummary {

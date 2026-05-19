@@ -5,7 +5,7 @@ import {
   fetchExpensesByCategory,
   fetchPaymentsByMethod,
   fetchDailyBreakdown,
-  fetchRevenueTrend,
+  fetchWeekdayRevenue,
   fetchCustomerSummary,
   fetchCustomerRankings,
   fetchServicesSummary,
@@ -71,13 +71,15 @@ export function useDailyBreakdown(dateFrom: string, dateTo: string) {
   })
 }
 
-// ─── Revenue Trend ────────────────────────────────────────────
+// ─── Weekday Revenue ─────────────────────────────────────────
 
-export function useRevenueTrend() {
+export function useWeekdayRevenue(dateFrom: string, dateTo: string) {
   return useQuery({
-    queryKey: QUERY_KEYS.reports.trend,
-    queryFn: fetchRevenueTrend,
+    queryKey: QUERY_KEYS.reports.weekdayRevenue(dateFrom, dateTo),
+    queryFn: () => fetchWeekdayRevenue(dateFrom, dateTo),
+    enabled: !!dateFrom && !!dateTo,
     staleTime: REPORTS_STALE_MS,
+    placeholderData: (prev) => prev,
   })
 }
 

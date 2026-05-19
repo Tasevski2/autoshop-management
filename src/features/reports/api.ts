@@ -5,7 +5,7 @@ import type {
   ExpenseCategoryItem,
   PaymentMethodItem,
   DailyBreakdownRow,
-  MonthlyTrendPoint,
+  WeekdayRevenue,
   CustomerSummary,
   CustomerRankingRow,
   CustomerSortColumn,
@@ -17,8 +17,6 @@ import type {
   PartSortColumn,
   SortDirection,
 } from './types'
-import { MK_MONTH_NAMES, MK_DAY_NAMES } from './utils'
-import { detectBucketType, getBucketLabel } from './utils'
 
 // ─── Financial Tab RPCs ──────────────────────────────────────
 
@@ -61,11 +59,10 @@ export async function fetchRevenueByBucket(
   if (error) throw error
   if (!data) return []
 
-  const bucketType = detectBucketType(dateFrom, dateTo)
   return data.map((r) => {
     const dateStr = String(r.bucket_date)
     return {
-      label: getBucketLabel(dateStr, bucketType),
+      label: dateStr,
       date: dateStr,
       partsRevenue: Number(r.parts_revenue),
       labor: Number(r.labor),
@@ -125,12 +122,11 @@ export async function fetchDailyBreakdown(
   if (error) throw error
   if (!data) return []
 
-  const bucketType = detectBucketType(dateFrom, dateTo)
   return data.map((r) => {
     const dateStr = String(r.bucket_date)
     return {
       date: dateStr,
-      label: getBucketLabel(dateStr, bucketType),
+      label: dateStr,
       serviceCount: Number(r.service_count),
       revenue: Number(r.revenue),
       partsCost: Number(r.parts_cost),
@@ -141,26 +137,45 @@ export async function fetchDailyBreakdown(
   })
 }
 
-// ─── Revenue Trend RPC ───────────────────────────────────────
+// ─── Weekday Revenue RPC ─────────────────────────────────────
 
-export async function fetchRevenueTrend(): Promise<MonthlyTrendPoint[]> {
-  const { data, error } = await supabase.rpc('get_revenue_trend')
+export async function fetchWeekdayRevenue(
+  dateFrom: string,
+  dateTo: string
+): Promise<WeekdayRevenue[]> {
+  const { data, error } = await supabase.rpc('get_weekday_revenue', {
+    p_from: dateFrom,
+    p_to: dateTo,
+  })
 
   if (error) throw error
-  if (!data || data.length === 0) return []
+  if (!data) return []
 
+  // Return Mon–Sat first, then Sunday only if it has revenue
+  // day is left empty — components fill it from i18n using dayIndex
+  const result: WeekdayRevenue[] = []
+  for (let i = 1; i <= 6; i++) {
+    const row = data.find((r) => Number(r.day_index) === i)
+    const revenue = row ? Number(row.total_revenue) : 0
+    const occurrences = row ? Number(row.weekday_occurrences) : 0
+    result.push({
+      day: '',
+      dayIndex: i,
+      avgRevenue: occurrences > 0 ? Math.round(revenue / occurrences) : 0,
+    })
+  }
 
-  return data.map((r) => {
-    const monthKey = String(r.month)
-    const monthIdx = parseInt(monthKey.slice(5, 7), 10) - 1
-    const totalRevenue = Number(r.total_revenue)
-    const distinctDays = Number(r.distinct_days)
-    return {
-      label: `${MK_MONTH_NAMES[monthIdx]} ${monthKey.slice(0, 4)}`,
-      month: monthKey,
-      avgRevenuePerDay: distinctDays > 0 ? Math.round(totalRevenue / distinctDays) : 0,
-    }
-  })
+  const sunday = data.find((r) => Number(r.day_index) === 0)
+  if (sunday && Number(sunday.total_revenue) > 0) {
+    const occurrences = Number(sunday.weekday_occurrences)
+    result.push({
+      day: '',
+      dayIndex: 0,
+      avgRevenue: occurrences > 0 ? Math.round(Number(sunday.total_revenue) / occurrences) : 0,
+    })
+  }
+
+  return result
 }
 
 // ─── Customers Tab RPCs ──────────────────────────────────────
@@ -293,13 +308,14 @@ export async function fetchWeekdayUtilization(
 
 
   // Return Mon–Sat first, then Sunday only if it has services
+  // day is left empty — components fill it from i18n using dayIndex
   const result: WeekdayAverage[] = []
   for (let i = 1; i <= 6; i++) {
     const row = data.find((r) => Number(r.day_index) === i)
     const svcCount = row ? Number(row.service_count) : 0
     const occurrences = row ? Number(row.weekday_occurrences) : 0
     result.push({
-      day: MK_DAY_NAMES[i],
+      day: '',
       dayIndex: i,
       avgServices: occurrences > 0 ? Math.round((svcCount / occurrences) * 10) / 10 : 0,
     })
@@ -309,7 +325,7 @@ export async function fetchWeekdayUtilization(
   if (sunday && Number(sunday.service_count) > 0) {
     const occurrences = Number(sunday.weekday_occurrences)
     result.push({
-      day: MK_DAY_NAMES[0],
+      day: '',
       dayIndex: 0,
       avgServices: occurrences > 0
         ? Math.round((Number(sunday.service_count) / occurrences) * 10) / 10
